@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GPC Poker League 能力分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: #141414;
+            --gold-primary: #D4AF37;
+            --gold-light: #F4C430;
+            --gold-dim: rgba(212, 175, 55, 0.1);
+            --text-main: #e0e0e0;
+            --text-sub: #888;
+            --header-height: 60px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 0%, #2a2a2a 0%, #0a0a0a 80%);
+            z-index: -1;
+        }
+
+        /* --- 顶部悬浮栏 --- */
+        .sticky-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333;
+            z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px;
+            transform: translateY(-100%);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .sticky-header.visible { transform: translateY(0); }
+
+        .sticky-title { font-size: 1rem; font-weight: bold; color: var(--gold-primary); display: none; }
+        @media (min-width: 600px) { .sticky-title { display: block; } }
+
+        .sticky-select-wrapper { flex-grow: 1; display: flex; justify-content: flex-end; }
+        .sticky-select {
+            background: #222; color: var(--gold-light); border: 1px solid #444;
+            padding: 5px 15px; border-radius: 4px; font-size: 0.9rem; outline: none;
+        }
+
+        /* --- 主容器 --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        header { text-align: center; margin-bottom: 30px; padding-top: 20px; transition: opacity 0.3s; }
+        h1 {
+            font-size: 1.8rem; color: var(--gold-primary); text-transform: uppercase;
+            letter-spacing: 2px; margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+        @media (min-width: 768px) { h1 { font-size: 2.2rem; } }
+        .subtitle { color: var(--text-sub); font-size: 0.9rem; letter-spacing: 1px; margin-bottom: 20px; }
+
+        /* 主选择器 */
+        .selector-wrapper { display: flex; justify-content: center; margin-bottom: 30px; position: relative; z-index: 10; }
+        .custom-select { position: relative; width: 100%; max-width: 300px; }
+        .custom-select select {
+            appearance: none; -webkit-appearance: none; width: 100%; font-size: 1rem;
+            padding: 12px 20px; background-color: rgba(20, 20, 20, 0.9);
+            border: 1px solid var(--gold-primary); border-radius: 4px; color: var(--gold-primary);
+            cursor: pointer; outline: none; box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            transition: all 0.3s; text-align: center; font-weight: bold;
+        }
+        .custom-select::after {
+            content: '▼'; font-size: 0.8rem; color: var(--gold-primary);
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none;
+        }
+
+        /* --- 仪表盘布局 (自适应关键) --- */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr; /* 移动端默认单栏，宽度自适应 */
+            gap: 20px;
+        }
+        @media (min-width: 900px) {
+            .dashboard { grid-template-columns: 1fr 1fr; gap: 30px; } /* PC端双栏 */
+            .full-width { grid-column: span 2; }
+        }
+
+        .card {
+            background: var(--card-bg); border: 1px solid #222; padding: 20px;
+            border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative; overflow: visible;
+        }
+        .card::after {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+        }
+        .card-title {
+            color: var(--gold-light); font-size: 1.1rem; margin-bottom: 20px;
+            border-bottom: 1px solid #333; padding-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px;
+        }
+        .card-sub { font-size: 0.75rem; color: #666; font-weight: normal; }
+
+        .rolling-number { display: inline-block; min-width: 1.5em; text-align: right; font-variant-numeric: tabular-nums; }
+
+        .chart-container { position: relative; height: 300px; width: 100%; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+
+        .scatter-wrapper { position: relative; height: 300px; width: 100%; padding: 20px; margin-top: 10px; }
+        @media (min-width: 768px) { .scatter-wrapper { height: 350px; } }
+
+        .quadrant-label {
+            position: absolute; font-size: 0.8rem; font-weight: bold; color: var(--text-sub);
+            pointer-events: none; text-transform: uppercase;
+        }
+        .q-top { top: -10px; left: 50%; transform: translateX(-50%); color: var(--gold-light); }
+        .q-bottom { bottom: -10px; left: 50%; transform: translateX(-50%); color: #aaa; }
+        .q-left { left: -10px; top: 50%; transform: translateY(-50%); color: #aaa; }
+        .q-right { right: -10px; top: 50%; transform: translateY(-50%); color: var(--gold-light); }
+
+        /* --- 评分细节 (两行排版优化) --- */
+        .detail-rows { display: flex; flex-direction: column; gap: 20px; }
+
+        .detail-row {
+            display: flex; flex-direction: column;
+            border-bottom: 1px solid #1a1a1a;
+            padding-bottom: 10px;
+        }
+
+        .row-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .d-label { font-size: 0.95rem; color: var(--text-main); font-weight: 500; }
+        .d-stats { font-size: 0.8rem; color: #666; font-family: 'Courier New', monospace; }
+        .stat-item { display: inline-block; margin-left: 10px; }
+        .stat-val { color: #ccc; font-weight: bold; display: inline-block; min-width: 20px; text-align: right; }
+        .stat-gap { color: var(--gold-primary); display: inline-block; min-width: 20px; text-align: right; }
+
+        .d-track-container {
+            position: relative; width: 100%; height: 16px;
+            display: flex; align-items: center;
+        }
+
+        .d-track-line {
+            width: 100%; height: 2px; background: #2a2a2a; border-radius: 2px;
+        }
+
+        .detail-point {
+            position: absolute; top: 50%; border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: left 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .detail-point.peer {
+            width: 6px; height: 6px;
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+            mix-blend-mode: screen;
+            z-index: 1;
+        }
+
+        .detail-point.self {
+            width: 10px; height: 10px;
+            background: var(--gold-primary);
+            border: none;
+            z-index: 2;
+            box-shadow: 0 0 6px var(--gold-primary);
+        }
+
+        .ai-advice { font-size: 0.95rem; color: #ccc; line-height: 1.8; }
+        /* 允许用户在建议中使用HTML标签，这里定义一些基础样式 */
+        .ai-advice strong { color: var(--gold-light); font-weight: bold; }
+        .ai-advice p { margin-bottom: 10px; }
+        .ai-advice ul { padding-left: 20px; margin-bottom: 10px; }
+        .ai-advice li { margin-bottom: 5px; }
+
+    </style>
+</head>
+<body>
+
+<!-- 顶部悬浮栏 -->
+<div class="sticky-header" id="stickyHeader">
+    <div class="sticky-title">GPC POKER LEAGUE</div>
+    <div class="sticky-select-wrapper">
+        <select id="stickyPlayerSelect" class="sticky-select"></select>
+    </div>
+</div>
+
+<div class="container">
+    <header id="mainHeader">
+        <h1>GPC POKER LEAGUE</h1>
+        <div class="subtitle">德州扑克战队能力评估</div>
+    </header>
+
+    <div class="selector-wrapper">
+        <div class="custom-select">
+            <select id="playerSelect"></select>
+        </div>
+    </div>
+
+    <div class="dashboard" id="dashboard">
+
+        <!-- 1. 雷达图 -->
+        <div class="card">
+            <div class="card-title">
+                综合能力雷达
+                <span class="card-sub"></span>
+            </div>
+            <div class="chart-container">
+                <canvas id="radarChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 2. 象限图 -->
+        <div class="card">
+            <div class="card-title">
+                选手画像定位
+                <span class="card-sub"></span>
+            </div>
+            <div class="scatter-wrapper">
+                <div class="quadrant-label q-top">紧</div>
+                <div class="quadrant-label q-bottom">松</div>
+                <div class="quadrant-label q-left">弱</div>
+                <div class="quadrant-label q-right">凶</div>
+                <canvas id="scatterChart"></canvas>
+            </div>
+            <div id="profileText" style="margin-top:20px; text-align:center; color:var(--gold-light); font-weight:bold; font-size: 1rem; min-height: 1.6em;">
+                <!-- JS 填充 -->
+            </div>
+        </div>
+
+        <!-- 3. 评分细节 -->
+        <div class="card full-width">
+            <div class="card-title">
+                评分分布细节
+                <span class="card-sub">
+                    认知偏差(MAE): <span id="maeValue" class="rolling-number" style="color:var(--gold-primary); font-weight:bold; font-size:1rem;">0.0</span>
+                </span>
+            </div>
+            <div class="detail-rows" id="detailRows">
+                <!-- JS 动态生成 -->
+            </div>
+        </div>
+
+        <!-- 4. AI 建议 (可编辑) -->
+        <div class="card full-width">
+            <div class="card-title">AI 战术顾问建议</div>
+            <div class="ai-advice" id="aiAdvice"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // ============================================================================
+    // ⚠️⚠️⚠️ 数据配置区域 (在此处填入您从Gemini获取的真实数据) ⚠️⚠️⚠️
+    // ============================================================================
+
+    const dimensions = ["范围构建", "锦标赛ICM", "激进偷盲", "读牌能力", "数学理论", "心态耐力"];
+
+    // 格式说明：
+    // id: 选手名字
+    // abilities: 对应上面 dimensions 的顺序。self是自评(0-10)，others是队友评分数组(0-10)
+    // profile: 松紧(tightness) 和 激进(aggression)。
+    // aiAdvice: 直接填入Gemini给出的建议HTML字符串。支持 <p>, <strong>, <br> 等标签。
+
+    const playersData = [
+        {
+            id: "队长 (Captain)",
+            abilities: [
+                { self: 9, others: [8, 9, 9, 8, 8, 9] }, // 范围构建
+                { self: 8, others: [7, 8, 8, 7, 8, 8] }, // 锦标赛ICM
+                { self: 7, others: [6, 7, 7, 6, 8, 7] }, // 激进偷盲
+                { self: 9, others: [9, 9, 8, 9, 9, 8] }, // 读牌能力
+                { self: 8, others: [8, 8, 8, 8, 8, 8] }, // 数学理论
+                { self: 9, others: [9, 9, 9, 9, 9, 9] }  // 心态耐力
+            ],
+            profile: {
+                tightness: { self: 7, others: [6, 7, 7, 6, 7, 7] },
+                aggression: { self: 6, others: [5, 6, 6, 5, 6, 6] }
+            },
+            aiAdvice: `
+                <p><strong>🤖 综合评价：</strong>作为队长，你的基础非常扎实，尤其在<strong>心态耐力</strong>和<strong>读牌能力</strong>上得到了全队的高度认可。MAE极低，说明自我认知清晰。</p>
+                <p><strong>💡 战术建议：</strong></p>
+                <ul>
+                    <li>你的偷盲频率在队友眼中略显保守（6-7分），在锦标赛后期可以尝试更宽的再加注范围。</li>
+                    <li>形象偏向“紧凶”，利用这个形象在翻牌前进行更多的3-bet诈唬。</li>
+                </ul>
+            `
+        },
+        {
+            id: "激进派 (Tom)",
+            abilities: [
+                { self: 8, others: [6, 7, 5, 6, 7, 6] },
+                { self: 6, others: [5, 5, 6, 5, 5, 6] },
+                { self: 10, others: [9, 10, 9, 10, 9, 10] },
+                { self: 7, others: [5, 6, 5, 6, 5, 6] },
+                { self: 5, others: [4, 5, 5, 4, 5, 5] },
+                { self: 6, others: [4, 5, 4, 5, 4, 5] }
+            ],
+            profile: {
+                tightness: { self: 3, others: [2, 3, 2, 3, 2, 3] }, // 很松
+                aggression: { self: 9, others: [9, 10, 9, 10, 9, 10] } // 很凶
+            },
+            aiAdvice: `
+                <p><strong>🤖 综合评价：</strong>典型的<strong>LAG（松凶）</strong>风格。你的侵略性是武器，但目前的认知偏差（MAE）较高，你高估了自己的读牌和范围构建能力。</p>
+                <p><strong>⚠️ 风险提示：</strong></p>
+                <p>队友普遍认为你的数学理论基础薄弱。建议复盘时多使用GTO Wizard检查自己的诈唬频率是否平衡，避免过度操作导致送筹码。</p>
+            `
+        },
+        {
+            id: "新手 (Rookie)",
+            abilities: [
+                { self: 5, others: [6, 6, 7, 6, 6, 7] },
+                { self: 4, others: [5, 5, 6, 5, 5, 6] },
+                { self: 5, others: [4, 5, 4, 5, 4, 5] },
+                { self: 6, others: [6, 7, 6, 7, 6, 7] },
+                { self: 7, others: [8, 9, 8, 9, 8, 9] },
+                { self: 5, others: [6, 7, 6, 7, 6, 7] }
+            ],
+            profile: {
+                tightness: { self: 8, others: [8, 9, 8, 9, 8, 9] },
+                aggression: { self: 3, others: [2, 3, 2, 3, 2, 3] }
+            },
+            aiAdvice: `
+                <p><strong>🤖 综合评价：</strong>你有些<strong>冒充者综合征（Imposter Syndrome）</strong>，你的自评普遍低于队友评分，尤其是数学能力。你比自己想象的要强！</p>
+                <p><strong>🚀 改进方向：</strong></p>
+                <p>你的风格过于被动（岩石型）。不要只在拿到坚果时才加注，尝试在有利位置用同花连张进行隔离加注。</p>
+            `
+        }
+    ];
+
+    // ============================================================================
+    // 逻辑代码 (以下部分无需修改)
+    // ============================================================================
+
+    // 计算全队平均值 (用于雷达图背景)
+    const teamAverages = dimensions.map((_, idx) => {
+        let sum = 0, count = 0;
+        playersData.forEach(p => {
+            // 累加自评
+            sum += p.abilities[idx].self;
+            count++;
+            // 累加他评
+            p.abilities[idx].others.forEach(v => {
+                sum += v;
+                count++;
+            });
+        });
+        return (sum / count).toFixed(1);
+    });
+
+    // --- 动画工具 ---
+    function animateValue(obj, start, end, duration) {
+        if (!obj) return;
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const easeProgress = 1 - Math.pow(1 - progress, 4);
+            const currentVal = (start + (end - start) * easeProgress);
+
+            if (Number.isInteger(end) && Number.isInteger(start)) {
+                obj.innerText = Math.round(currentVal);
+            } else {
+                obj.innerText = currentVal.toFixed(1);
+            }
+
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                obj.innerText = Number.isInteger(end) ? end : end.toFixed(1);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // --- 初始化与事件 ---
+    let radarChart = null;
+    let scatterChart = null;
+    const playerSelect = document.getElementById('playerSelect');
+    const stickySelect = document.getElementById('stickyPlayerSelect');
+    const stickyHeader = document.getElementById('stickyHeader');
+    const mainHeader = document.getElementById('mainHeader');
+    const detailRows = document.getElementById('detailRows');
+    const aiAdvice = document.getElementById('aiAdvice');
+    const profileText = document.getElementById('profileText');
+    const maeValueDisplay = document.getElementById('maeValue');
+
+    // 填充下拉菜单
+    function populateSelects() {
+        playersData.forEach((p, index) => {
+            const opt1 = document.createElement('option');
+            opt1.value = index;
+            opt1.innerText = p.id;
+            playerSelect.appendChild(opt1);
+
+            const opt2 = document.createElement('option');
+            opt2.value = index;
+            opt2.innerText = p.id;
+            stickySelect.appendChild(opt2);
+        });
+    }
+    populateSelects();
+
+    function handlePlayerChange(index) {
+        playerSelect.value = index;
+        stickySelect.value = index;
+        updateDashboard(playersData[index]);
+    }
+
+    playerSelect.addEventListener('change', (e) => handlePlayerChange(e.target.value));
+    stickySelect.addEventListener('change', (e) => handlePlayerChange(e.target.value));
+
+    // 滚动监听
+    window.addEventListener('scroll', () => {
+        const triggerHeight = mainHeader.offsetHeight + 20;
+        if (window.scrollY > triggerHeight) {
+            stickyHeader.classList.add('visible');
+        } else {
+            stickyHeader.classList.remove('visible');
+        }
+    });
+
+    Chart.defaults.color = '#888';
+    Chart.defaults.borderColor = '#333';
+    Chart.defaults.font.family = "'Helvetica Neue', 'PingFang SC', sans-serif";
+
+    // 初始化细节行DOM
+    function initDetailRows() {
+        const allLabels = [...dimensions, "松紧倾向", "激进倾向"];
+
+        allLabels.forEach((label, i) => {
+            const row = document.createElement('div');
+            row.className = 'detail-row';
+            row.dataset.index = i;
+
+            const rowHeader = document.createElement('div');
+            rowHeader.className = 'row-header';
+
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'd-label';
+            labelDiv.innerText = label;
+
+            const statsDiv = document.createElement('div');
+            statsDiv.className = 'd-stats';
+            statsDiv.innerHTML = `
+                <span class="stat-item">自:<span class="stat-val" id="row-${i}-val-self">0</span></span>
+                <span class="stat-item">他:<span class="stat-val" id="row-${i}-val-other">0</span></span>
+                <span class="stat-item">差:<span class="stat-gap" id="row-${i}-val-diff">0</span></span>
+            `;
+
+            rowHeader.appendChild(labelDiv);
+            rowHeader.appendChild(statsDiv);
+
+            const trackContainer = document.createElement('div');
+            trackContainer.className = 'd-track-container';
+            const line = document.createElement('div');
+            line.className = 'd-track-line';
+            trackContainer.appendChild(line);
+
+            // 预先创建点 (假设最多20个队友评分，不够的隐藏)
+            for(let j=0; j<20; j++) {
+                const p = document.createElement('div');
+                p.className = 'detail-point peer';
+                p.id = `row-${i}-peer-${j}`;
+                p.style.display = 'none'; // 默认隐藏
+                p.style.left = '50%';
+                trackContainer.appendChild(p);
+            }
+            const selfP = document.createElement('div');
+            selfP.className = 'detail-point self';
+            selfP.id = `row-${i}-self`;
+            selfP.style.left = '50%';
+            trackContainer.appendChild(selfP);
+
+            row.appendChild(rowHeader);
+            row.appendChild(trackContainer);
+            detailRows.appendChild(row);
+        });
+    }
+
+    initDetailRows();
+
+    function updateDashboard(player) {
+        updateRadar(player);
+        updateScatter(player);
+        updateDetails(player);
+        // 直接渲染配置好的HTML建议
+        aiAdvice.innerHTML = player.aiAdvice;
+    }
+
+    function updateRadar(player) {
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        const selfData = player.abilities.map(a => a.self);
+        const otherAvgData = player.abilities.map(a => (a.others.reduce((x,y)=>x+y,0)/a.others.length).toFixed(1));
+        const gradientSelf = ctx.createRadialGradient(200, 200, 0, 200, 200, 200);
+        gradientSelf.addColorStop(0, 'rgba(212, 175, 55, 0.6)');
+        gradientSelf.addColorStop(1, 'rgba(212, 175, 55, 0.1)');
+
+        if (radarChart) {
+            radarChart.data.datasets[0].data = selfData;
+            radarChart.data.datasets[1].data = otherAvgData;
+            radarChart.update({ duration: 1000, easing: 'easeInOutQuart' });
+        } else {
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: dimensions,
+                    datasets: [
+                        {
+                            label: '自评',
+                            data: selfData,
+                            borderColor: '#D4AF37',
+                            backgroundColor: gradientSelf,
+                            borderWidth: 2,
+                            pointBackgroundColor: '#D4AF37',
+                            pointRadius: 3
+                        },
+                        {
+                            label: '他评',
+                            data: otherAvgData,
+                            borderColor: '#aaa',
+                            backgroundColor: 'rgba(255,255,255,0.02)',
+                            borderDash: [4, 4],
+                            borderWidth: 1,
+                            pointBackgroundColor: '#aaa',
+                            pointRadius: 2
+                        },
+                        {
+                            label: '战队平均',
+                            data: teamAverages,
+                            borderColor: 'transparent',
+                            backgroundColor: 'rgba(50, 50, 50, 0.3)',
+                            pointRadius: 0,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#333' },
+                            grid: { color: '#222', lineWidth: 1 },
+                            pointLabels: { color: '#ccc', font: { size: 12 } },
+                            suggestedMin: 0, suggestedMax: 10, ticks: { display: false }
+                        }
+                    },
+                    plugins: { legend: { labels: { color: '#aaa' } } }
+                }
+            });
+        }
+    }
+
+    function updateScatter(player) {
+        const ctx = document.getElementById('scatterChart').getContext('2d');
+        const avgTight = player.profile.tightness.others.reduce((a,b)=>a+b,0) / player.profile.tightness.others.length;
+        const avgAgg = player.profile.aggression.others.reduce((a,b)=>a+b,0) / player.profile.aggression.others.length;
+
+        const getLabel = (t, a) => {
+            let tLabel = t > 6.5 ? "紧" : (t < 4.5 ? "松" : "中性");
+            let aLabel = a > 6.5 ? "凶" : (a < 4.5 ? "弱" : "中性");
+            if (tLabel === "中性" && aLabel === "中性") return "平衡型选手";
+            if (tLabel === "紧" && aLabel === "凶") return "紧凶型 (TAG)";
+            if (tLabel === "松" && aLabel === "凶") return "松凶型 (LAG)";
+            if (tLabel === "紧" && aLabel === "弱") return "岩石型 (Nit)";
+            if (tLabel === "松" && aLabel === "弱") return "松弱型 (Fish)";
+            return `${tLabel}${aLabel}倾向`;
+        };
+
+        profileText.style.opacity = 0;
+        setTimeout(() => {
+            profileText.innerText = `综合画像判定：${getLabel(avgTight, avgAgg)}`;
+            profileText.style.transition = 'opacity 0.5s';
+            profileText.style.opacity = 1;
+        }, 200);
+
+        if (scatterChart) {
+            scatterChart.data.datasets[0].data = [{x: player.profile.tightness.self, y: player.profile.aggression.self}];
+            scatterChart.data.datasets[1].data = [{x: avgTight, y: avgAgg}];
+            scatterChart.update({ duration: 1200, easing: 'easeInOutQuart' });
+        } else {
+            scatterChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: '自评定位',
+                            data: [{x: player.profile.tightness.self, y: player.profile.aggression.self}],
+                            backgroundColor: '#D4AF37', borderColor: 'transparent', borderWidth: 0, pointRadius: 6
+                        },
+                        {
+                            label: '队友眼中的你',
+                            data: [{x: avgTight, y: avgAgg}],
+                            backgroundColor: '#fff', borderColor: '#D4AF37', borderWidth: 1, pointRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    layout: { padding: 10 },
+                    scales: {
+                        x: { min: 0, max: 11, grid: { color: c=>c.tick.value===5.5?'#444':'#222', lineWidth: c=>c.tick.value===5.5?1:0.5 }, ticks: {display:false} },
+                        y: { min: 0, max: 11, grid: { color: c=>c.tick.value===5.5?'#444':'#222', lineWidth: c=>c.tick.value===5.5?1:0.5 }, ticks: {display:false} }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { color: '#aaa' } } }
+                }
+            });
+        }
+    }
+
+    function updateDetails(player) {
+        const allDims = [
+            ...player.abilities.map(a => ({self: a.self, others: a.others})),
+            {self: player.profile.tightness.self, others: player.profile.tightness.others},
+            {self: player.profile.aggression.self, others: player.profile.aggression.others}
+        ];
+
+        let totalError = 0;
+        allDims.forEach(d => {
+            const avg = d.others.reduce((a,b)=>a+b,0)/d.others.length;
+            totalError += Math.abs(d.self - avg);
+        });
+        const mae = totalError / allDims.length;
+
+        const oldMae = parseFloat(maeValueDisplay.innerText) || 0;
+        animateValue(maeValueDisplay, oldMae, mae, 1000);
+
+        allDims.forEach((item, i) => {
+            const avg = (item.others.reduce((a,b)=>a+b,0) / item.others.length);
+            const gap = Math.abs(item.self - avg);
+
+            const selfDot = document.getElementById(`row-${i}-self`);
+            if(selfDot) selfDot.style.left = (item.self / 10) * 100 + '%';
+
+            // 重置所有点
+            for(let k=0; k<20; k++) {
+                const p = document.getElementById(`row-${i}-peer-${k}`);
+                if(p) p.style.display = 'none';
+            }
+
+            item.others.forEach((val, j) => {
+                const peerDot = document.getElementById(`row-${i}-peer-${j}`);
+                if (peerDot) {
+                    peerDot.style.display = 'block';
+                    const jitter = (Math.random() - 0.5) * 1.5;
+                    const safeVal = Math.max(0, Math.min(100, (val/10)*100 + jitter));
+                    peerDot.style.left = safeVal + '%';
+                }
+            });
+
+            const elSelf = document.getElementById(`row-${i}-val-self`);
+            const elOther = document.getElementById(`row-${i}-val-other`);
+            const elDiff = document.getElementById(`row-${i}-val-diff`);
+
+            const prevSelf = parseFloat(elSelf.innerText) || 0;
+            const prevOther = parseFloat(elOther.innerText) || 0;
+            const prevDiff = parseFloat(elDiff.innerText) || 0;
+
+            animateValue(elSelf, prevSelf, item.self, 800);
+            animateValue(elOther, prevOther, avg, 800);
+            animateValue(elDiff, prevDiff, gap, 800);
+        });
+    }
+
+    // 启动
+    updateDashboard(playersData[0]);
+
+</script>
+</body>
+</html>

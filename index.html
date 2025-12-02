@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GPC Poker League 能力分析</title>
+    <title>GPC Poker League 能力互评</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -51,8 +51,12 @@
         }
         .sticky-header.visible { transform: translateY(0); }
 
-        .sticky-title { font-size: 1rem; font-weight: bold; color: var(--gold-primary); display: none; }
-        @media (min-width: 600px) { .sticky-title { display: block; } }
+        /* 新增：悬浮栏 Logo 样式 */
+        .sticky-logo {
+            height: 36px; /* 根据悬浮栏高度(60px)调整，留出边距 */
+            width: auto;  /* 保持比例 */
+            display: block;
+        }
 
         .sticky-select-wrapper { flex-grow: 1; display: flex; justify-content: flex-end; }
         .sticky-select {
@@ -64,13 +68,29 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
         header { text-align: center; margin-bottom: 30px; padding-top: 20px; transition: opacity 0.3s; }
+
+        /* 新增：主 Logo 样式 */
+        .main-logo-wrapper {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+        }
+        .main-logo {
+            max-width: 200px; /* 控制主Logo最大宽度 */
+            height: auto;
+        }
+
         h1 {
             font-size: 1.8rem; color: var(--gold-primary); text-transform: uppercase;
             letter-spacing: 2px; margin-bottom: 5px;
             text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
         }
         @media (min-width: 768px) { h1 { font-size: 2.2rem; } }
-        .subtitle { color: var(--text-sub); font-size: 0.9rem; letter-spacing: 1px; margin-bottom: 20px; }
+        .subtitle {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
 
         /* 主选择器 */
         .selector-wrapper { display: flex; justify-content: center; margin-bottom: 30px; position: relative; z-index: 10; }
@@ -85,6 +105,61 @@
         .custom-select::after {
             content: '▼'; font-size: 0.8rem; color: var(--gold-primary);
             position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none;
+        }
+        /* 确保标签内部是横向排列的 */
+        /* 1. 基础布局：让文字和箭头横向排列、垂直居中 */
+        .quadrant-label {
+            position: absolute;      /* 绝对定位，相对于 .scatter-wrapper */
+            display: flex;           /* Flex 布局 */
+            align-items: center;     /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+            gap: 6px;                /* 文字和箭头间距 */
+            color: rgba(255, 255, 255, 0.6); /* 颜色 */
+            font-size: 12px;
+            pointer-events: none;    /* 防止遮挡 Canvas 点击事件 */
+            z-index: 10;             /* 确保在 Canvas 之上 */
+        }
+
+        /* 2. SVG 箭头样式 */
+        .axis-arrow {
+            width: 40px;             /* 箭头长度 */
+            height: 10px;            /* 箭头高度 */
+            fill: none;
+            stroke: currentColor;    /* 跟随文字颜色 */
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* 3. 底部标签定位 (X轴) */
+        .q-bottom {
+            bottom: 5px;             /* 距离底部的位置 */
+            left: 0;
+            width: 100%;             /* 占满宽度以居中 */
+        }
+
+        /* 4. 左侧标签定位 (Y轴) - 关键修改 */
+        .q-left {
+            /* 先定位到左侧垂直居中的位置 */
+            top: 50%;
+            left: 0;
+
+            /*
+               关键点：
+               1. translate(-50%, -50%): 先把自身的中心点对齐到 left:0, top:50% 的位置
+               2. rotate(-90deg): 逆时针旋转 90 度
+            */
+            transform: translate(-42%, -50%) rotate(-90deg);
+
+            /*
+               如果旋转后位置偏离，可以微调上面的 translate(-42%, ...)
+               或者使用 transform-origin
+            */
+            transform-origin: center center;
+
+            /* 确保宽度足够容纳文字和箭头，避免换行 */
+            width: auto;
+            white-space: nowrap;
         }
 
         /* --- 仪表盘布局 (自适应关键) --- */
@@ -121,15 +196,6 @@
 
         .scatter-wrapper { position: relative; height: 300px; width: 100%; padding: 20px; margin-top: 10px; }
         @media (min-width: 768px) { .scatter-wrapper { height: 350px; } }
-
-        .quadrant-label {
-            position: absolute; font-size: 0.8rem; font-weight: bold; color: var(--text-sub);
-            pointer-events: none; text-transform: uppercase;
-        }
-        .q-top { top: -10px; left: 50%; transform: translateX(-50%); color: var(--gold-light); }
-        .q-bottom { bottom: -10px; left: 50%; transform: translateX(-50%); color: #aaa; }
-        .q-left { left: -10px; top: 50%; transform: translateY(-50%); color: #aaa; }
-        .q-right { right: -10px; top: 50%; transform: translateY(-50%); color: var(--gold-light); }
 
         /* --- 评分细节 (两行排版优化) --- */
         .detail-rows { display: flex; flex-direction: column; gap: 20px; }
@@ -195,7 +261,9 @@
 
 <!-- 顶部悬浮栏 -->
 <div class="sticky-header" id="stickyHeader">
-    <div class="sticky-title">GPC POKER LEAGUE</div>
+    <!-- 修改点：替换原有的文字标题为长方形 Logo -->
+    <img src="logo_sticky.png" alt="GPC Logo" class="sticky-logo">
+
     <div class="sticky-select-wrapper">
         <select id="stickyPlayerSelect" class="sticky-select"></select>
     </div>
@@ -203,8 +271,13 @@
 
 <div class="container">
     <header id="mainHeader">
+        <!-- 修改点：在标题最上方添加主 Logo -->
+        <div class="main-logo-wrapper">
+            <img src="logo_main.png" alt="GPC Main Logo" class="main-logo">
+        </div>
+
         <h1>GPC POKER LEAGUE</h1>
-        <div class="subtitle">德州扑克战队能力评估</div>
+        <div class="subtitle">德州扑克能力互评报告</div>
     </header>
 
     <div class="selector-wrapper">
@@ -232,13 +305,35 @@
                 选手画像定位
                 <span class="card-sub"></span>
             </div>
+
             <div class="scatter-wrapper">
-                <div class="quadrant-label q-top">紧</div>
-                <div class="quadrant-label q-bottom">松</div>
-                <div class="quadrant-label q-left">弱</div>
-                <div class="quadrant-label q-right">凶</div>
+                <!-- 底部横轴：松 <-> 紧 -->
+                <div class="quadrant-label q-bottom">
+                    <span>松</span>
+                    <!-- SVG 双向箭头 -->
+                    <svg class="axis-arrow" viewBox="0 0 60 12" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="2" y1="6" x2="58" y2="6" />
+                        <polyline points="6,2 2,6 6,10" />
+                        <polyline points="54,2 58,6 54,10" />
+                    </svg>
+                    <span>紧</span>
+                </div>
+
+                <!-- 左侧纵轴：弱 <-> 凶 -->
+                <div class="quadrant-label q-left">
+                    <span>弱</span>
+                    <!-- SVG 双向箭头 (代码完全一样，靠父容器旋转) -->
+                    <svg class="axis-arrow" viewBox="0 0 60 12" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="2" y1="6" x2="58" y2="6" />
+                        <polyline points="6,2 2,6 6,10" />
+                        <polyline points="54,2 58,6 54,10" />
+                    </svg>
+                    <span>凶</span>
+                </div>
+
                 <canvas id="scatterChart"></canvas>
             </div>
+
             <div id="profileText" style="margin-top:20px; text-align:center; color:var(--gold-light); font-weight:bold; font-size: 1rem; min-height: 1.6em;">
                 <!-- JS 填充 -->
             </div>
@@ -283,16 +378,16 @@
         {
             id: "队长 (Captain)",
             abilities: [
-                { self: 9, others: [8, 9, 9, 8, 8, 9] }, // 范围构建
-                { self: 8, others: [7, 8, 8, 7, 8, 8] }, // 锦标赛ICM
-                { self: 7, others: [6, 7, 7, 6, 8, 7] }, // 激进偷盲
-                { self: 9, others: [9, 9, 8, 9, 9, 8] }, // 读牌能力
-                { self: 8, others: [8, 8, 8, 8, 8, 8] }, // 数学理论
-                { self: 9, others: [9, 9, 9, 9, 9, 9] }  // 心态耐力
+                { self: 9, others: [7, 6, 9, 8, 8, 9] }, // 范围构建
+                { self: 8, others: [7, 8, 6, 7, 4, 9] }, // 锦标赛ICM
+                { self: 7, others: [6, 9, 6, 4, 5, 7] }, // 激进偷盲
+                { self: 9, others: [9, 6, 8, 7, 5, 8] }, // 读牌能力
+                { self: 8, others: [3, 5, 9, 9, 8, 7] }, // 数学理论
+                { self: 9, others: [4, 6, 5, 9, 8, 7] }  // 心态耐力
             ],
             profile: {
-                tightness: { self: 7, others: [6, 7, 7, 6, 7, 7] },
-                aggression: { self: 6, others: [5, 6, 6, 5, 6, 6] }
+                tightness: { self: 7, others: [6, 9, 9, 6, 7, 8] },
+                aggression: { self: 6, others: [5, 4, 6, 5, 7, 6] }
             },
             aiAdvice: `
                 <p><strong>🤖 综合评价：</strong>作为队长，你的基础非常扎实，尤其在<strong>心态耐力</strong>和<strong>读牌能力</strong>上得到了全队的高度认可。MAE极低，说明自我认知清晰。</p>
@@ -574,8 +669,8 @@
         const avgAgg = player.profile.aggression.others.reduce((a,b)=>a+b,0) / player.profile.aggression.others.length;
 
         const getLabel = (t, a) => {
-            let tLabel = t > 6.5 ? "紧" : (t < 4.5 ? "松" : "中性");
-            let aLabel = a > 6.5 ? "凶" : (a < 4.5 ? "弱" : "中性");
+            let tLabel = t > 6.5 ? "紧" : (t < 3.5 ? "松" : "中性");
+            let aLabel = a > 6.5 ? "凶" : (a < 3.5 ? "弱" : "中性");
             if (tLabel === "中性" && aLabel === "中性") return "平衡型选手";
             if (tLabel === "紧" && aLabel === "凶") return "紧凶型 (TAG)";
             if (tLabel === "松" && aLabel === "凶") return "松凶型 (LAG)";
@@ -616,10 +711,37 @@
                     responsive: true, maintainAspectRatio: false,
                     layout: { padding: 10 },
                     scales: {
-                        x: { min: 0, max: 11, grid: { color: c=>c.tick.value===5.5?'#444':'#222', lineWidth: c=>c.tick.value===5.5?1:0.5 }, ticks: {display:false} },
-                        y: { min: 0, max: 11, grid: { color: c=>c.tick.value===5.5?'#444':'#222', lineWidth: c=>c.tick.value===5.5?1:0.5 }, ticks: {display:false} }
+                        x: {
+                            min: 0, max: 10,
+                            grid: {
+                                color: (c) => c.tick.value === 5 ? 'rgba(212, 175, 55, 0.5)' : '#222',
+                                lineWidth: (c) => c.tick.value === 5 ? 2 : 1
+                            },
+                            ticks: { display: false, stepSize: 1 },
+                            border: { display: false }
+                        },
+                        y: {
+                            min: 0, max: 10,
+                            grid: {
+                                color: (c) => c.tick.value === 5 ? 'rgba(212, 175, 55, 0.5)' : '#222',
+                                lineWidth: (c) => c.tick.value === 5 ? 2 : 1
+                            },
+                            ticks: { display: false, stepSize: 1 },
+                            border: { display: false }
+                        }
                     },
-                    plugins: { legend: { position: 'bottom', labels: { color: '#aaa' } } }
+                    plugins: {
+                        legend: {
+                            position: 'top',  // 放在顶部区域
+                            align: 'end',     // 核心修改：对齐到末端（右侧）
+                            labels: {
+                                color: '#aaa',
+                                boxWidth: 8,  // 稍微改小一点色块，更精致
+                                padding: 10,
+                                font: { size: 10 } // 字体稍微改小一点，避免在小屏手机上太挤
+                            }
+                        }
+                    }
                 }
             });
         }

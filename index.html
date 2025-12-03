@@ -8,7 +8,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Serif+SC:wght@300;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Serif+SC:wght@300;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+          rel="stylesheet">
 
     <style>
         :root {
@@ -36,7 +37,11 @@
             --header-height: 70px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: var(--font-data);
@@ -49,28 +54,52 @@
         }
 
         body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: radial-gradient(circle at 50% 0%, var(--glow-color) 0%, var(--bg-deep) 70%);
-            z-index: -1; pointer-events: none; opacity: 0.6;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.6;
         }
 
         /* --- 顶部悬浮栏 (修正版) --- */
         .sticky-header {
-            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
             background: rgba(5, 5, 5, 0.95);
             border-bottom: 1px solid var(--border-color);
             z-index: 1000;
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             padding: 0 20px;
             transform: translateY(-100%);
             transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
         }
-        .sticky-header.visible { transform: translateY(0); }
 
-        .sticky-logo { height: 40px; width: auto; display: block; }
+        .sticky-header.visible {
+            transform: translateY(0);
+        }
 
-        .sticky-select-wrapper { flex-grow: 1; display: flex; justify-content: flex-end; }
+        .sticky-logo {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+
+        .sticky-select-wrapper {
+            flex-grow: 1;
+            display: flex;
+            justify-content: flex-end;
+        }
 
         /* [修正] 新增容器，用于定位箭头 */
         .sticky-select-container {
@@ -81,7 +110,8 @@
 
         /* [修正] 右上角下拉框样式优化 */
         .sticky-select {
-            appearance: none; -webkit-appearance: none; /* 移除iOS默认样式 */
+            appearance: none;
+            -webkit-appearance: none; /* 移除iOS默认样式 */
             background: transparent;
             color: var(--accent-gold);
             border: 1px solid var(--border-color);
@@ -90,7 +120,8 @@
             font-size: 0.85rem;
             outline: none;
             border-radius: 0;
-            max-width: 140px; /* 限制最大宽度 */
+            width: auto;
+            /*max-width: 10px; !* 限制最大宽度 *!*/
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
@@ -107,108 +138,641 @@
         }
 
         /* --- 主容器 --- */
-        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 1; }
-
-        header { text-align: center; margin-bottom: 60px; padding-top: 20px; position: relative; }
-        header::after {
-            content: ""; display: block; width: 1px; height: 50px;
-            background: linear-gradient(to bottom, transparent, var(--accent-gold), transparent);
-            margin: 25px auto 0; opacity: 0.3;
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        .main-logo-wrapper { margin-bottom: 20px; display: flex; justify-content: center; }
-        .main-logo { max-width: 220px; height: auto; }
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-top: 20px;
+            position: relative;
+        }
+
+        header::after {
+            content: "";
+            display: block;
+            width: 1px;
+            height: 50px;
+            background: linear-gradient(to bottom, transparent, var(--accent-gold), transparent);
+            margin: 25px auto 0;
+            opacity: 0.3;
+        }
+
+        .main-logo-wrapper {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-logo {
+            max-width: 220px;
+            height: auto;
+        }
 
         h1 {
-            font-family: var(--font-heading); font-size: 2.2rem; color: var(--text-main);
-            text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 10px; font-weight: 500;
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 10px;
+            font-weight: 500;
             text-shadow: 0 0 20px rgba(197, 160, 89, 0.1);
         }
-        @media (max-width: 768px) { h1 { font-size: 1.6rem; letter-spacing: 0.1em; } }
 
-        .subtitle { font-family: var(--font-heading); color: var(--text-muted); font-size: 1.5rem; letter-spacing: 0.1em; }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.6rem;
+                letter-spacing: 0.1em;
+            }
+        }
+
+        .subtitle {
+            font-family: var(--font-heading);
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+        }
 
         /* 主选择器 */
-        .selector-wrapper { display: flex; justify-content: center; margin-bottom: 50px; position: relative; z-index: 10; }
-        .custom-select { position: relative; width: 100%; max-width: 320px; }
-        .custom-select select {
-            appearance: none; -webkit-appearance: none; width: 100%;
-            font-family: var(--font-heading); font-size: 1.1rem; letter-spacing: 0.1em;
-            padding: 15px 20px; background-color: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color); color: var(--accent-gold);
-            cursor: pointer; outline: none; transition: all 0.4s ease; text-align: center; border-radius: 0;
+        .selector-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 50px;
+            position: relative;
+            z-index: 10;
         }
-        .custom-select select:hover { border-color: var(--border-highlight); box-shadow: 0 0 15px var(--accent-glow); }
+
+        .custom-select {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .custom-select select {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            letter-spacing: 0.1em;
+            padding: 15px 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            color: var(--accent-gold);
+            cursor: pointer;
+            outline: none;
+            transition: all 0.4s ease;
+            text-align: center;
+            border-radius: 0;
+        }
+
+        .custom-select select:hover {
+            border-color: var(--border-highlight);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
         .custom-select::after {
-            content: '▼'; font-size: 0.7rem; color: var(--accent-gold);
-            position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none;
+            content: '▼';
+            font-size: 0.7rem;
+            color: var(--accent-gold);
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
         }
 
         /* --- 仪表盘 --- */
-        .dashboard { display: grid; grid-template-columns: 1fr; gap: 40px; }
-        @media (min-width: 900px) { .dashboard { grid-template-columns: 1fr 1fr; gap: 50px; } .full-width { grid-column: span 2; } }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        @media (min-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+                gap: 50px;
+            }
+
+            .full-width {
+                grid-column: span 2;
+            }
+        }
 
         .card {
-            background: var(--bg-panel); border: 1px solid var(--border-color); padding: 30px;
-            position: relative; transition: border-color 0.3s; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            position: relative;
+            transition: border-color 0.3s;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
         }
+
         .card::before, .card::after {
-            content: ""; position: absolute; width: 8px; height: 8px; border: 1px solid var(--accent-gold); transition: all 0.3s; opacity: 0.5;
+            content: "";
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border: 1px solid var(--accent-gold);
+            transition: all 0.3s;
+            opacity: 0.5;
         }
-        .card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
-        .card::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
-        .card:hover { border-color: var(--border-highlight); }
+
+        .card::before {
+            top: -1px;
+            left: -1px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .card::after {
+            bottom: -1px;
+            right: -1px;
+            border-left: none;
+            border-top: none;
+        }
+
+        .card:hover {
+            border-color: var(--border-highlight);
+        }
 
         .card-title {
-            font-family: var(--font-heading); color: var(--text-main); font-size: 1.2rem;
-            margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 15px; display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px;
-            letter-spacing: 0.05em; font-weight: 500;
+            font-family: var(--font-heading);
+            color: var(--text-main);
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 10px;
+            letter-spacing: 0.05em;
+            font-weight: 500;
         }
-        .card-sub { font-family: var(--font-data); font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0; }
 
-        .rolling-number { font-family: 'Space Mono', monospace; color: var(--accent-gold); }
+        .card-sub {
+            font-family: var(--font-data);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0;
+        }
 
-        .chart-container { position: relative; height: 320px; width: 100%; }
-        @media (min-width: 768px) { .chart-container { height: 380px; } }
+        .rolling-number {
+            font-family: 'Space Mono', monospace;
+            color: var(--accent-gold);
+        }
 
-        .scatter-wrapper { position: relative; height: 320px; width: 100%; padding: 20px; }
-        @media (min-width: 768px) { .scatter-wrapper { height: 380px; } }
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 380px;
+            }
+        }
+
+        .scatter-wrapper {
+            position: relative;
+            height: 320px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .scatter-wrapper {
+                height: 380px;
+            }
+        }
 
         .quadrant-label {
-            position: absolute; display: flex; align-items: center; justify-content: center; gap: 8px;
-            color: var(--text-muted); font-size: 11px; pointer-events: none; z-index: 10;
-            font-family: var(--font-data); letter-spacing: 1px; opacity: 0.7;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 11px;
+            pointer-events: none;
+            z-index: 10;
+            font-family: var(--font-data);
+            letter-spacing: 1px;
+            opacity: 0.7;
         }
-        .axis-arrow { width: 30px; height: 8px; fill: none; stroke: var(--text-muted); stroke-width: 1; opacity: 0.5; }
-        .q-bottom { bottom: 0; left: 0; width: 100%; }
-        .q-left { top: 50%; left: 0; transform: translate(-42%, -50%) rotate(-90deg); transform-origin: center center; width: auto; white-space: nowrap; }
+
+        .axis-arrow {
+            width: 30px;
+            height: 8px;
+            fill: none;
+            stroke: var(--text-muted);
+            stroke-width: 1;
+            opacity: 0.5;
+        }
+
+        .q-bottom {
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .q-left {
+            top: 50%;
+            left: 0;
+            transform: translate(-42%, -50%) rotate(-90deg);
+            transform-origin: center center;
+            width: auto;
+            white-space: nowrap;
+        }
 
         /* Data Breakdown */
-        .detail-rows { display: flex; flex-direction: column; gap: 25px; }
-        .detail-row { display: flex; flex-direction: column; padding-bottom: 5px; }
-        .row-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
-        .d-label { font-family: var(--font-heading); font-size: 1rem; color: var(--text-main); letter-spacing: 0.1em; font-weight: 300; }
-        .d-stats { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-data); }
-        .stat-item { display: inline-block; margin-left: 15px; }
-        .stat-label-small { font-size: 0.7rem; opacity: 0.6; margin-right: 2px; }
-        .stat-val { color: var(--text-main); font-weight: 400; }
-        .stat-gap { color: var(--accent-gold); }
-        .d-track-container { position: relative; width: 100%; height: 20px; display: flex; align-items: center; }
-        .d-track-line { width: 100%; height: 1px; background: rgba(255,255,255,0.1); }
+        .detail-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
 
-        .detail-point { position: absolute; top: 50%; transform: translate(-50%, -50%); transition: left 1.5s cubic-bezier(0.22, 1, 0.36, 1); }
-        .detail-point.peer { width: 3px; height: 3px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.4); box-shadow: 0 0 4px rgba(255, 255, 255, 0.2); z-index: 1; }
-        .detail-point.self { width: 7px; height: 7px; background: var(--accent-gold); transform: translate(-50%, -50%) rotate(45deg); border: 1px solid #000; z-index: 2; box-shadow: 0 0 8px var(--accent-glow); }
+        .detail-row {
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 5px;
+        }
 
-        .ai-advice { font-family: var(--font-data); font-size: 0.9rem; color: #a0a0a0; line-height: 1.9; border-left: 1px solid var(--accent-gold); padding-left: 25px; margin-left: 5px; }
-        .ai-advice strong { color: var(--accent-gold); font-weight: 400; font-family: var(--font-heading); letter-spacing: 0.05em; }
-        .ai-advice p { margin-bottom: 15px; text-align: justify; }
-        .ai-advice ul { padding-left: 15px; margin-bottom: 15px; list-style-type: none; }
-        .ai-advice li { margin-bottom: 8px; color: var(--text-muted); position: relative; padding-left: 15px; }
-        .ai-advice li::before { content: ">"; position: absolute; left: -5px; color: var(--accent-gold); font-size: 0.8rem;}
+        .row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 12px;
+        }
 
-        footer { height: 100px; display: flex; justify-content: center; align-items: center; opacity: 0.3; font-size: 0.7rem; font-family: var(--font-data); letter-spacing: 2px;}
+        .d-label {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            color: var(--text-main);
+            letter-spacing: 0.1em;
+            font-weight: 300;
+        }
+
+        .d-stats {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: var(--font-data);
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin-left: 15px;
+        }
+
+        .stat-label-small {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-right: 2px;
+        }
+
+        .stat-val {
+            color: var(--text-main);
+            font-weight: 400;
+        }
+
+        .stat-gap {
+            color: var(--accent-gold);
+        }
+
+        .d-track-container {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .d-track-line {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-point {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition: left 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .detail-point.peer {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+            z-index: 1;
+        }
+
+        .detail-point.self {
+            width: 9px;
+            height: 9px;
+            background: var(--accent-gold);
+            transform: translate(-50%, -50%) rotate(45deg);
+            border: 1px solid #000;
+            z-index: 2;
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .ai-advice {
+            font-family: var(--font-data);
+            font-size: 0.9rem;
+            color: #a0a0a0;
+            line-height: 1.9;
+            border-left: 1px solid var(--accent-gold);
+            padding-left: 25px;
+            margin-left: 5px;
+            /* === 新增动效优化 === */
+            transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .ai-advice strong {
+            color: var(--accent-gold);
+            font-weight: 400;
+            font-family: var(--font-heading);
+            letter-spacing: 0.05em;
+        }
+
+        .ai-advice p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .ai-advice ul {
+            padding-left: 15px;
+            margin-bottom: 15px;
+            list-style-type: none;
+        }
+
+        .ai-advice li {
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .ai-advice li::before {
+            content: ">";
+            position: absolute;
+            left: -5px;
+            color: var(--accent-gold);
+            font-size: 0.8rem;
+        }
+
+        footer {
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.3;
+            font-size: 0.7rem;
+            font-family: var(--font-data);
+            letter-spacing: 2px;
+        }
+
+        /* --- 自定义图例样式 --- */
+        .custom-chart-legend {
+            position: absolute;
+            top: 5px;
+            right: 26px;
+            display: flex;
+            gap: 20px;
+            z-index: 20; /* 确保在 Canvas 之上 */
+            pointer-events: none; /* 防止挡住鼠标与图表的交互 */
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .legend-icon {
+            width: 8px;
+            height: 8px;
+        }
+
+        /* 自评图标：金色菱形 */
+        .legend-icon.icon-self {
+            background-color: var(--accent-gold);
+            transform: rotate(45deg);
+            box-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        /* 队友图标：灰色圆形 */
+        .legend-icon.icon-peer {
+            background-color: #f1f1f1; /* 或者用 #e0e0e0 稍微亮一点 */
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        /* ============================================================
+   【审美提升】 动画与效果
+   ============================================================ */
+
+        /* --- 1. Keyframes 动画定义 --- */
+
+        /* 标题“呼吸”辉光 */
+        @keyframes pulse-text-glow {
+            0% {
+                text-shadow: 0 0 20px rgba(197, 160, 89, 0.1);
+            }
+            50% {
+                text-shadow: 0 0 35px rgba(197, 160, 89, 0.4);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(197, 160, 89, 0.1);
+            }
+        }
+
+        /* “自评”数据点脉冲 */
+        @keyframes pulse-gold {
+            0% {
+                transform: translate(-50%, -50%) rotate(45deg) scale(1);
+                box-shadow: 0 0 8px var(--accent-glow);
+                background-color: var(--accent-gold);
+            }
+            50% {
+                transform: translate(-50%, -50%) rotate(45deg) scale(1.4);
+                box-shadow: 0 0 18px var(--accent-glow);
+                background-color: #f0e0b0; /* 闪烁至白金色 */
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(45deg) scale(1);
+                box-shadow: 0 0 8px var(--accent-glow);
+                background-color: var(--accent-gold);
+            }
+        }
+
+        /* --- 2. 应用动画与效果 --- */
+
+        /* 为 body::before 叠加一层微妙的“扫描线”纹理 */
+        body::before {
+            background: radial-gradient(circle at 50% 0%, var(--glow-color) 0%, var(--bg-deep) 70%),
+                /* 新增：微妙的扫描线纹理 */ repeating-linear-gradient(
+                    to bottom,
+                    transparent 0,
+                    rgba(255, 255, 255, 0.02) 1px,
+                    transparent 3px
+            );
+        }
+
+        /* 1. 为 H1 标题添加“呼吸”辉光 */
+        h1 {
+            animation: pulse-text-glow 4s infinite alternate;
+        }
+
+        /* 2. 增强卡片 (Card) 的交互动效 */
+        .card {
+            /* 为 transition 增加 transform 和 box-shadow */
+            transition: border-color 0.4s ease,
+            transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .card:hover {
+            border-color: var(--border-highlight);
+            /* 动效：更强的辉光 */
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.8), /* 底部阴影加深 */ 0 0 20px var(--accent-glow); /* 金色辉光 */
+        }
+
+        /* 3. 卡片边角在悬停时也一起发光 */
+        .card:hover::before, .card:hover::after {
+            opacity: 1;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* 4. 为主选择器添加 :focus 状态，使其在激活时发光 */
+        .custom-select select:hover,
+        .custom-select select:focus {
+            border-color: var(--border-highlight);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* 5. 让“评分分布细节”中的“自评”点产生脉冲，突出显示 */
+        .detail-point.self {
+            /* 增加动画 */
+            animation: pulse-gold 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 6. 让“他评”的圆点更大更清晰 */
+        .detail-point.peer {
+            width: 6px;
+            height: 6px;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+        }
+
+        /* 7. 让“自评”的菱形也更大 */
+        .detail-point.self {
+            width: 9px;
+            height: 9px;
+        }
+
+        /* ============================================================
+   【外观蜕变】 玻璃拟态 (Glassmorphism)
+   ============================================================ */
+
+        /* --- 1. 赋予卡片“磨砂玻璃”质感 --- */
+        .card {
+            /* 关键：
+              1. 降低背景不透明度，让背景光透进来
+              2. 添加 backdrop-filter 来模糊背景
+              3. 更改边框为“玻璃亮边”
+            */
+            background: hsla(var(--theme-hue-panel), var(--theme-sat), var(--bg-l-panel), 0.65); /* 0.85 -> 0.65 */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); /* 兼容 Safari */
+
+            border: 1px solid rgba(255, 255, 255, 0.1); /* 更改为玻璃亮边 */
+
+            /* 增强悬停时的“辉光”而非“阴影” */
+            transition: border-color 0.4s ease,
+            transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* 悬停时，取消厚重的黑色阴影，只保留“上浮”和“辉光” */
+        .card:hover {
+            box-shadow: 0 0 25px var(--accent-glow); /* 移除黑色阴影，只留辉光 */
+            border-color: var(--border-highlight);
+        }
+
+        /* 卡片边角改为低调的亮白色，悬停时再变为金色 */
+        .card::before, .card::after {
+            border-color: rgba(255, 255, 255, 0.25);
+            opacity: 0.8;
+        }
+
+        .card:hover::before, .card:hover::after {
+            border-color: var(--accent-gold);
+        }
+
+
+        /* --- 2. 顶部悬浮栏也变为“玻璃” --- */
+        .sticky-header {
+            background: hsla(0, 0%, 5%, 0.75); /* 0.95 -> 0.75 */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* 统一边框 */
+        }
+
+
+        /* --- 3. 中间的主选择器也“玻璃化” --- */
+        /*.custom-select select {*/
+        /*    background-color: rgba(0, 0, 0, 0.2); !* 0.5 -> 0.2 *!*/
+        /*    backdrop-filter: blur(5px);*/
+        /*    -webkit-backdrop-filter: blur(5px);*/
+        /*    border: 1px solid rgba(255, 255, 255, 0.1);*/
+        /*}*/
+
+
+        /* --- 4. [点睛之笔] 赋予标题“金属渐变”质感 --- */
+        h1 {
+            /* 使用渐变作为文字颜色 */
+            background: linear-gradient(145deg,
+            #ffffff 20%,
+            var(--accent-gold) 80%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent; /* Fallback */
+            animation: pulse-text-glow 4s infinite alternate; /* 保持呼吸辉光 */
+        }
+
+        .subtitle {
+            /* 副标题也使用更低调的渐变 */
+            background: linear-gradient(145deg,
+            #d0d0d0 30%,
+            #707570 90%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -259,20 +823,37 @@
             </div>
 
             <div class="scatter-wrapper">
+                <!-- 新增：自定义图例 -->
+                <div class="custom-chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-icon icon-self"></div>
+                        <span>自评定位</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-icon icon-peer"></div>
+                        <span>他人眼中</span>
+                    </div>
+                </div>
+
                 <div class="quadrant-label q-bottom">
                     <span>松 (Loose)</span>
-                    <svg class="axis-arrow" viewBox="0 0 60 12"><line x1="0" y1="6" x2="60" y2="6" /></svg>
+                    <svg class="axis-arrow" viewBox="0 0 60 12">
+                        <line x1="0" y1="6" x2="60" y2="6"/>
+                    </svg>
                     <span>紧 (Tight)</span>
                 </div>
                 <div class="quadrant-label q-left">
                     <span>弱 (Passive)</span>
-                    <svg class="axis-arrow" viewBox="0 0 60 12"><line x1="0" y1="6" x2="60" y2="6" /></svg>
+                    <svg class="axis-arrow" viewBox="0 0 60 12">
+                        <line x1="0" y1="6" x2="60" y2="6"/>
+                    </svg>
                     <span>凶 (Aggressive)</span>
                 </div>
                 <canvas id="scatterChart"></canvas>
             </div>
 
-            <div id="profileText" style="margin-top:20px; text-align:center; color:var(--accent-gold); font-family: var(--font-heading); font-size: 1rem; letter-spacing: 0.1em; min-height: 1.6em;"></div>
+            <div id="profileText"
+                 style="margin-top:20px; text-align:center; color:var(--accent-gold); font-family: var(--font-heading); font-size: 1rem; letter-spacing: 0.1em; min-height: 1.6em;"></div>
         </div>
 
         <!-- 3. 评分细节 -->
@@ -280,7 +861,8 @@
             <div class="card-title">
                 评分分布细节
                 <span class="card-sub">
-                    认知偏差 (MAE): <span id="maeValue" class="rolling-number" style="font-weight:bold; font-size:1.1rem;">0.0</span>
+                    认知偏差 (MAE): <span id="maeValue" class="rolling-number"
+                                          style="font-weight:bold; font-size:1.1rem;">0.0</span>
                 </span>
             </div>
             <div class="detail-rows" id="detailRows"></div>
@@ -312,16 +894,16 @@
             mae: "0.8",
             profileLabel: "综合画像判定：紧凶型 (TAG)",
             abilities: [
-                { self: 9, others: [8, 9, 8, 7, 9, 8, 9, 8, 7] },
-                { self: 8, others: [7, 8, 8, 6, 7, 8, 7, 8, 9] },
-                { self: 9, others: [9, 9, 8, 9, 9, 8, 9, 9, 8] },
-                { self: 7, others: [6, 7, 5, 6, 7, 6, 7, 5, 6] },
-                { self: 8, others: [8, 7, 8, 9, 8, 7, 8, 8, 7] },
-                { self: 9, others: [9, 8, 9, 9, 8, 9, 8, 9, 9] }
+                {self: 9, others: [8, 9, 8, 7, 9, 8, 9, 8, 7]},
+                {self: 8, others: [7, 8, 8, 6, 7, 8, 7, 8, 9]},
+                {self: 9, others: [9, 9, 8, 9, 9, 8, 9, 9, 8]},
+                {self: 7, others: [6, 7, 5, 6, 7, 6, 7, 5, 6]},
+                {self: 8, others: [8, 7, 8, 9, 8, 7, 8, 8, 7]},
+                {self: 9, others: [9, 8, 9, 9, 8, 9, 8, 9, 9]}
             ],
             profile: {
-                tightness: { self: 8.5, others: [8, 9, 8, 7, 9, 8, 8, 9, 7] },
-                aggression: { self: 9.0, others: [8, 9, 9, 8, 9, 9, 8, 9, 8] }
+                tightness: {self: 8.5, others: [8, 9, 8, 7, 9, 8, 8, 9, 7]},
+                aggression: {self: 9.0, others: [8, 9, 9, 8, 9, 9, 8, 9, 8]}
             },
             aiAdvice: `
                 <p><strong>综合评价：</strong>典型的鲨鱼玩家，各项数据非常顶尖。你的<strong>数学计算</strong>和<strong>学习能力</strong>是团队的核心资产。</p>
@@ -337,16 +919,16 @@
             mae: "2.4",
             profileLabel: "综合画像判定：松凶型 (LAG)",
             abilities: [
-                { self: 8, others: [5, 6, 4, 7, 5, 6, 4, 5, 6] },
-                { self: 10, others: [9, 10, 9, 8, 10, 9, 9, 10, 8] },
-                { self: 6, others: [4, 5, 3, 4, 5, 4, 3, 5, 4] },
-                { self: 9, others: [2, 3, 2, 4, 3, 2, 3, 2, 4] },
-                { self: 7, others: [5, 6, 4, 5, 6, 5, 4, 6, 5] },
-                { self: 5, others: [4, 3, 4, 5, 4, 3, 4, 5, 4] }
+                {self: 8, others: [5, 6, 4, 7, 5, 6, 4, 5, 6]},
+                {self: 10, others: [9, 10, 9, 8, 10, 9, 9, 10, 8]},
+                {self: 6, others: [4, 5, 3, 4, 5, 4, 3, 5, 4]},
+                {self: 9, others: [2, 3, 2, 4, 3, 2, 3, 2, 4]},
+                {self: 7, others: [5, 6, 4, 5, 6, 5, 4, 6, 5]},
+                {self: 5, others: [4, 3, 4, 5, 4, 3, 4, 5, 4]}
             ],
             profile: {
-                tightness: { self: 3.0, others: [2, 3, 2, 4, 2, 3, 2, 3, 2] },
-                aggression: { self: 9.5, others: [10, 9, 10, 9, 10, 9, 10, 9, 10] }
+                tightness: {self: 3.0, others: [2, 3, 2, 4, 2, 3, 2, 3, 2]},
+                aggression: {self: 9.5, others: [10, 9, 10, 9, 10, 9, 10, 9, 10]}
             },
             aiAdvice: `
                 <p><strong>综合评价：</strong>你是牌桌上的炸药桶，给对手制造了巨大的压力。你的<strong>诈唬频率</strong>极高，但基础数学跑分较低。</p>
@@ -362,16 +944,16 @@
             mae: "1.1",
             profileLabel: "综合画像判定：紧弱型 (Nit)",
             abilities: [
-                { self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6] },
-                { self: 3, others: [2, 3, 2, 3, 2, 3, 2, 3, 2] },
-                { self: 8, others: [7, 8, 7, 8, 7, 8, 7, 8, 7] },
-                { self: 9, others: [9, 9, 8, 9, 9, 8, 9, 9, 9] },
-                { self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5] },
-                { self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6] }
+                {self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]},
+                {self: 3, others: [2, 3, 2, 3, 2, 3, 2, 3, 2]},
+                {self: 8, others: [7, 8, 7, 8, 7, 8, 7, 8, 7]},
+                {self: 9, others: [9, 9, 8, 9, 9, 8, 9, 9, 9]},
+                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]},
+                {self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]}
             ],
             profile: {
-                tightness: { self: 9.0, others: [9, 9, 8, 9, 9, 9, 8, 9, 9] },
-                aggression: { self: 3.0, others: [2, 3, 2, 3, 2, 3, 2, 3, 2] }
+                tightness: {self: 9.0, others: [9, 9, 8, 9, 9, 9, 8, 9, 9]},
+                aggression: {self: 3.0, others: [2, 3, 2, 3, 2, 3, 2, 3, 2]}
             },
             aiAdvice: `
                 <p><strong>综合评价：</strong>你是最稳健的防守者，几乎不会犯大错。但你的打法过于诚实，容易被对手通过弃牌剥削。</p>
@@ -387,16 +969,16 @@
             mae: "3.5",
             profileLabel: "综合画像判定：自我认知偏差型",
             abilities: [
-                { self: 9, others: [4, 5, 3, 6, 4, 5, 3, 4, 5] },
-                { self: 8, others: [3, 4, 2, 5, 3, 4, 2, 3, 4] },
-                { self: 7, others: [5, 6, 5, 6, 5, 6, 5, 6, 5] },
-                { self: 8, others: [4, 5, 4, 5, 4, 5, 4, 5, 4] },
-                { self: 9, others: [2, 3, 2, 4, 2, 3, 2, 3, 2] },
-                { self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5] }
+                {self: 9, others: [4, 5, 3, 6, 4, 5, 3, 4, 5]},
+                {self: 8, others: [3, 4, 2, 5, 3, 4, 2, 3, 4]},
+                {self: 7, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]},
+                {self: 8, others: [4, 5, 4, 5, 4, 5, 4, 5, 4]},
+                {self: 9, others: [2, 3, 2, 4, 2, 3, 2, 3, 2]},
+                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]}
             ],
             profile: {
-                tightness: { self: 7.0, others: [3, 4, 3, 4, 3, 4, 3, 4, 3] },
-                aggression: { self: 8.0, others: [7, 8, 6, 7, 8, 7, 6, 8, 7] }
+                tightness: {self: 7.0, others: [3, 4, 3, 4, 3, 4, 3, 4, 3]},
+                aggression: {self: 8.0, others: [7, 8, 6, 7, 8, 7, 6, 8, 7]}
             },
             aiAdvice: `
                 <p><strong>综合评价：</strong>数据警报！你的自我评分（MAE 3.5）与队友评价存在巨大鸿沟。你认为自己是紧凶高手，但数据表明你打得非常松。</p>
@@ -412,16 +994,16 @@
             mae: "1.8",
             profileLabel: "综合画像判定：松弱型 (Fish)",
             abilities: [
-                { self: 5, others: [3, 4, 3, 4, 3, 4, 3, 4, 3] },
-                { self: 4, others: [2, 3, 2, 3, 2, 3, 2, 3, 2] },
-                { self: 3, others: [2, 2, 3, 2, 2, 3, 2, 2, 3] },
-                { self: 10, others: [10, 10, 10, 10, 10, 10, 10, 10, 10] },
-                { self: 8, others: [8, 9, 8, 9, 8, 9, 8, 9, 8] },
-                { self: 4, others: [3, 4, 3, 4, 3, 4, 3, 4, 3] }
+                {self: 5, others: [3, 4, 3, 4, 3, 4, 3, 4, 3]},
+                {self: 4, others: [2, 3, 2, 3, 2, 3, 2, 3, 2]},
+                {self: 3, others: [2, 2, 3, 2, 2, 3, 2, 2, 3]},
+                {self: 10, others: [10, 10, 10, 10, 10, 10, 10, 10, 10]},
+                {self: 8, others: [8, 9, 8, 9, 8, 9, 8, 9, 8]},
+                {self: 4, others: [3, 4, 3, 4, 3, 4, 3, 4, 3]}
             ],
             profile: {
-                tightness: { self: 4.0, others: [2, 3, 2, 3, 2, 3, 2, 3, 2] },
-                aggression: { self: 4.0, others: [2, 3, 2, 3, 2, 3, 2, 3, 2] }
+                tightness: {self: 4.0, others: [2, 3, 2, 3, 2, 3, 2, 3, 2]},
+                aggression: {self: 4.0, others: [2, 3, 2, 3, 2, 3, 2, 3, 2]}
             },
             aiAdvice: `
                 <p><strong>综合评价：</strong>你是牌桌上最受欢迎的玩家，心态极好，资金充裕。但技术层面存在明显的漏洞，入池率过高且缺乏攻击性。</p>
@@ -437,16 +1019,16 @@
             mae: "0.3",
             profileLabel: "综合画像判定：GTO 均衡型",
             abilities: [
-                { self: 8, others: [8, 8, 9, 8, 8, 9, 8, 8, 9] },
-                { self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8] },
-                { self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9] },
-                { self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8] },
-                { self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9] },
-                { self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9] }
+                {self: 8, others: [8, 8, 9, 8, 8, 9, 8, 8, 9]},
+                {self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8]},
+                {self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9]},
+                {self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8]},
+                {self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9]},
+                {self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9]}
             ],
             profile: {
-                tightness: { self: 7.5, others: [7, 8, 7, 8, 7, 8, 7, 8, 7] },
-                aggression: { self: 7.5, others: [7, 8, 7, 8, 7, 8, 7, 8, 7] }
+                tightness: {self: 7.5, others: [7, 8, 7, 8, 7, 8, 7, 8, 7]},
+                aggression: {self: 7.5, others: [7, 8, 7, 8, 7, 8, 7, 8, 7]}
             },
             aiAdvice: `
                 <p><strong>综合评价：</strong>完美的六边形战士。你的各项指标都非常均衡，几乎没有短板，打法接近 GTO（博弈论最优）。</p>
@@ -462,16 +1044,16 @@
             mae: "0.9",
             profileLabel: "综合画像判定：中庸偏紧型",
             abilities: [
-                { self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5] },
-                { self: 5, others: [4, 5, 4, 5, 4, 5, 4, 5, 4] },
-                { self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6] },
-                { self: 6, others: [6, 6, 6, 6, 6, 6, 6, 6, 6] },
-                { self: 7, others: [7, 7, 7, 7, 7, 7, 7, 7, 7] },
-                { self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5] }
+                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]},
+                {self: 5, others: [4, 5, 4, 5, 4, 5, 4, 5, 4]},
+                {self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]},
+                {self: 6, others: [6, 6, 6, 6, 6, 6, 6, 6, 6]},
+                {self: 7, others: [7, 7, 7, 7, 7, 7, 7, 7, 7]},
+                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]}
             ],
             profile: {
-                tightness: { self: 6.5, others: [6, 7, 6, 7, 6, 7, 6, 7, 6] },
-                aggression: { self: 5.0, others: [4, 5, 4, 5, 4, 5, 4, 5, 4] }
+                tightness: {self: 6.5, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]},
+                aggression: {self: 5.0, others: [4, 5, 4, 5, 4, 5, 4, 5, 4]}
             },
             aiAdvice: `
                 <p><strong>综合评价：</strong>你的存在感较低，但这有时是一种优势。你很少犯错，但也缺乏创造力，很难在深筹码时清空对手。</p>
@@ -487,16 +1069,16 @@
             mae: "1.2",
             profileLabel: "综合画像判定：狡猾多变型",
             abilities: [
-                { self: 8, others: [7, 8, 6, 9, 7, 8, 6, 9, 7] },
-                { self: 9, others: [8, 9, 7, 9, 8, 9, 7, 9, 8] },
-                { self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5] },
-                { self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6] },
-                { self: 8, others: [7, 8, 7, 8, 7, 8, 7, 8, 7] },
-                { self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6] }
+                {self: 8, others: [7, 8, 6, 9, 7, 8, 6, 9, 7]},
+                {self: 9, others: [8, 9, 7, 9, 8, 9, 7, 9, 8]},
+                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]},
+                {self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]},
+                {self: 8, others: [7, 8, 7, 8, 7, 8, 7, 8, 7]},
+                {self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]}
             ],
             profile: {
-                tightness: { self: 5.5, others: [4, 6, 5, 7, 4, 6, 5, 7, 5] },
-                aggression: { self: 7.0, others: [6, 8, 6, 8, 6, 8, 6, 8, 6] }
+                tightness: {self: 5.5, others: [4, 6, 5, 7, 4, 6, 5, 7, 5]},
+                aggression: {self: 7.0, others: [6, 8, 6, 8, 6, 8, 6, 8, 6]}
             },
             aiAdvice: `
                 <p><strong>综合评价：</strong>你非常擅长变换节奏，让对手难以捉摸。队友对你的评价方差很大，说明你成功地混淆了视听。</p>
@@ -512,16 +1094,16 @@
             mae: "0.2",
             profileLabel: "综合画像判定：ABC 标准型",
             abilities: [
-                { self: 7, others: [7, 7, 7, 7, 7, 7, 7, 7, 7] },
-                { self: 6, others: [6, 6, 6, 6, 6, 6, 6, 6, 6] },
-                { self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8] },
-                { self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8] },
-                { self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9] },
-                { self: 7, others: [7, 7, 7, 7, 7, 7, 7, 7, 7] }
+                {self: 7, others: [7, 7, 7, 7, 7, 7, 7, 7, 7]},
+                {self: 6, others: [6, 6, 6, 6, 6, 6, 6, 6, 6]},
+                {self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8]},
+                {self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8]},
+                {self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9]},
+                {self: 7, others: [7, 7, 7, 7, 7, 7, 7, 7, 7]}
             ],
             profile: {
-                tightness: { self: 8.0, others: [8, 8, 8, 8, 8, 8, 8, 8, 8] },
-                aggression: { self: 6.0, others: [6, 6, 6, 6, 6, 6, 6, 6, 6] }
+                tightness: {self: 8.0, others: [8, 8, 8, 8, 8, 8, 8, 8, 8]},
+                aggression: {self: 6.0, others: [6, 6, 6, 6, 6, 6, 6, 6, 6]}
             },
             aiAdvice: `
                 <p><strong>综合评价：</strong>你像机器人一样执行策略，情绪极其稳定，从不 Tilt。你是低级别牌桌的收割机，但在高级别容易被针对。</p>
@@ -537,16 +1119,16 @@
             mae: "1.5",
             profileLabel: "综合画像判定：激进翻盘型",
             abilities: [
-                { self: 7, others: [6, 7, 5, 8, 6, 7, 5, 8, 6] },
-                { self: 8, others: [7, 9, 6, 8, 7, 9, 6, 8, 7] },
-                { self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5] },
-                { self: 5, others: [4, 5, 4, 5, 4, 5, 4, 5, 4] },
-                { self: 9, others: [8, 9, 9, 9, 8, 9, 9, 9, 8] },
-                { self: 8, others: [7, 8, 7, 8, 7, 8, 7, 8, 7] }
+                {self: 7, others: [6, 7, 5, 8, 6, 7, 5, 8, 6]},
+                {self: 8, others: [7, 9, 6, 8, 7, 9, 6, 8, 7]},
+                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]},
+                {self: 5, others: [4, 5, 4, 5, 4, 5, 4, 5, 4]},
+                {self: 9, others: [8, 9, 9, 9, 8, 9, 9, 9, 8]},
+                {self: 8, others: [7, 8, 7, 8, 7, 8, 7, 8, 7]}
             ],
             profile: {
-                tightness: { self: 4.5, others: [3, 5, 4, 6, 3, 5, 4, 6, 4] },
-                aggression: { self: 8.5, others: [8, 9, 8, 9, 8, 9, 8, 9, 8] }
+                tightness: {self: 4.5, others: [3, 5, 4, 6, 3, 5, 4, 6, 4]},
+                aggression: {self: 8.5, others: [8, 9, 8, 9, 8, 9, 8, 9, 8]}
             },
             aiAdvice: `
                 <p><strong>综合评价：</strong>你拥有一颗大心脏，经常在短码时上演奇迹翻盘。你的风格极具侵略性，擅长给对手施压。</p>
@@ -568,9 +1150,12 @@
         playersData.forEach(p => {
             sum += p.abilities[idx].self;
             count++;
-            p.abilities[idx].others.forEach(v => { sum += v; count++; });
+            p.abilities[idx].others.forEach(v => {
+                sum += v;
+                count++;
+            });
         });
-        return (sum / count).toFixed(1);
+        return (sum / count).toFixed(2);
     });
 
     let radarChart = null;
@@ -586,10 +1171,17 @@
 
     function populateSelects() {
         playersData.forEach((p, index) => {
-            const opt1 = document.createElement('option'); opt1.value = index; opt1.innerText = p.id; playerSelect.appendChild(opt1);
-            const opt2 = document.createElement('option'); opt2.value = index; opt2.innerText = p.id; stickySelect.appendChild(opt2);
+            const opt1 = document.createElement('option');
+            opt1.value = index;
+            opt1.innerText = p.id;
+            playerSelect.appendChild(opt1);
+            const opt2 = document.createElement('option');
+            opt2.value = index;
+            opt2.innerText = p.id;
+            stickySelect.appendChild(opt2);
         });
     }
+
     populateSelects();
 
     function handlePlayerChange(index) {
@@ -613,7 +1205,9 @@
     function initDetailRows() {
         const allLabels = [...dimensions, "松紧倾向", "激进倾向"];
         allLabels.forEach((label, i) => {
-            const row = document.createElement('div'); row.className = 'detail-row'; row.dataset.index = i;
+            const row = document.createElement('div');
+            row.className = 'detail-row';
+            row.dataset.index = i;
             row.innerHTML = `
                 <div class="row-header">
                     <div class="d-label">${label}</div>
@@ -625,13 +1219,14 @@
                 </div>
                 <div class="d-track-container">
                     <div class="d-track-line"></div>
-                    ${Array.from({length:20}).map((_,j) => `<div class="detail-point peer" id="row-${i}-peer-${j}" style="display:none; left:50%"></div>`).join('')}
+                    ${Array.from({length: 20}).map((_, j) => `<div class="detail-point peer" id="row-${i}-peer-${j}" style="display:none; left:50%"></div>`).join('')}
                     <div class="detail-point self" id="row-${i}-self" style="left:50%"></div>
                 </div>
             `;
             detailRows.appendChild(row);
         });
     }
+
     initDetailRows();
 
     function updateDashboard(index) {
@@ -640,8 +1235,20 @@
         updateScatter(index);
         updateDetails(player);
 
-        aiAdvice.innerHTML = player.aiAdvice;
+        // [修改] 原来的: aiAdvice.innerHTML = player.aiAdvice;
+        // --- AI 建议动效优化 ---
+        // 1. 开始淡出并轻微“下沉”
+        aiAdvice.style.opacity = 0;
+        aiAdvice.style.transform = 'translateY(15px)';
 
+        // 2. 等待淡出动画（约 300 毫秒），然后更新内容并“浮起”
+        setTimeout(() => {
+            aiAdvice.innerHTML = player.aiAdvice;
+            aiAdvice.style.opacity = 1;
+            aiAdvice.style.transform = 'translateY(0)'; // 恢复到原位
+        }, 300); // 这个延迟时间略短于 CSS 的 400ms，以确保内容在淡出后更新
+
+        // --- profileText 动画 (保持不变) ---
         profileText.style.opacity = 0;
         setTimeout(() => {
             profileText.innerText = player.profileLabel;
@@ -649,13 +1256,13 @@
             profileText.style.opacity = 1;
         }, 200);
 
-        maeValueDisplay.innerText = player.mae;
+        animateValue(maeValueDisplay, parseFloat(player.mae), false);
     }
 
     function updateRadar(player) {
         const ctx = document.getElementById('radarChart').getContext('2d');
         const selfData = player.abilities.map(a => a.self);
-        const otherAvgData = player.abilities.map(a => (a.others.reduce((x,y)=>x+y,0)/a.others.length).toFixed(1));
+        const otherAvgData = player.abilities.map(a => (a.others.reduce((x, y) => x + y, 0) / a.others.length).toFixed(1));
 
         const gradientSelf = ctx.createRadialGradient(200, 200, 0, 200, 200, 200);
         gradientSelf.addColorStop(0, 'rgba(197, 160, 89, 0.2)');
@@ -664,7 +1271,7 @@
         if (radarChart) {
             radarChart.data.datasets[0].data = selfData;
             radarChart.data.datasets[1].data = otherAvgData;
-            radarChart.update({ duration: 1500, easing: 'easeInOutQuart' });
+            radarChart.update({duration: 1500, easing: 'easeInOutQuart'});
         } else {
             radarChart = new Chart(ctx, {
                 type: 'radar',
@@ -672,18 +1279,36 @@
                     labels: dimensions,
                     datasets: [
                         {
-                            label: '自评', data: selfData,
-                            borderColor: '#C5A059', backgroundColor: gradientSelf,
-                            borderWidth: 2, pointBackgroundColor: '#000', pointBorderColor: '#C5A059', pointBorderWidth: 2, pointRadius: 4, order: 1
+                            label: '自评    ',
+                            data: selfData,
+                            borderColor: '#C5A059',
+                            backgroundColor: gradientSelf,
+                            borderWidth: 2,
+                            pointBackgroundColor: '#000',
+                            pointBorderColor: '#C5A059',
+                            pointBorderWidth: 2,
+                            pointRadius: 3,
+                            order: 1
                         },
                         {
-                            label: '他评', data: otherAvgData,
-                            borderColor: '#707570', backgroundColor: 'transparent',
-                            borderDash: [3, 3], borderWidth: 1, pointBackgroundColor: '#707570', pointRadius: 2, order: 2
+                            label: '他评    ',
+                            data: otherAvgData,
+                            borderColor: '#707570',
+                            backgroundColor: 'transparent',
+                            borderDash: [3, 3],
+                            borderWidth: 1,
+                            pointBackgroundColor: '#707570',
+                            pointRadius: 2,
+                            order: 2
                         },
                         {
-                            label: '战队平均', data: teamAverages,
-                            borderColor: 'transparent', backgroundColor: 'rgba(255, 255, 255, 0.03)', pointRadius: 0, fill: true, order: 3
+                            label: '全员平均',
+                            data: teamAverages,
+                            borderColor: 'transparent',
+                            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                            pointRadius: 2,
+                            fill: true,
+                            order: 3
                         }
                     ]
                 },
@@ -691,14 +1316,21 @@
                     responsive: true, maintainAspectRatio: false,
                     scales: {
                         r: {
-                            angleLines: { color: 'rgba(255,255,255,0.03)' },
-                            grid: { color: 'rgba(255,255,255,0.03)', circular: true },
-                            pointLabels: { color: '#d0d0d0', font: { size: 12, family: "'Noto Serif SC', serif" } },
-                            suggestedMin: 0, suggestedMax: 10, ticks: { display: false, stepSize: 2 }
+                            angleLines: {color: 'rgba(255,255,255,0.03)'},
+                            grid: {color: 'rgba(255,255,255,0.03)', circular: true},
+                            pointLabels: {color: '#d0d0d0', font: {size: 12, family: "'Noto Serif SC', serif"}},
+                            suggestedMin: 0, suggestedMax: 10, ticks: {display: false, stepSize: 2}
                         }
                     },
                     plugins: {
-                        legend: { labels: { color: '#707570', font: { family: "'Noto Serif SC', serif" }, boxWidth: 8, usePointStyle: true } }
+                        legend: {
+                            labels: {
+                                color: '#707570',
+                                font: {family: "'Noto Serif SC', serif"},
+                                boxWidth: 8,
+                                usePointStyle: true
+                            }
+                        }
                     }
                 }
             });
@@ -713,18 +1345,18 @@
         const allOtherPoints = [];
 
         playersData.forEach((p, idx) => {
-            const avgTight = p.profile.tightness.others.reduce((a,b)=>a+b,0) / p.profile.tightness.others.length;
-            const avgAgg = p.profile.aggression.others.reduce((a,b)=>a+b,0) / p.profile.aggression.others.length;
+            const avgTight = p.profile.tightness.others.reduce((a, b) => a + b, 0) / p.profile.tightness.others.length;
+            const avgAgg = p.profile.aggression.others.reduce((a, b) => a + b, 0) / p.profile.aggression.others.length;
 
-            allSelfPoints.push({ x: p.profile.tightness.self, y: p.profile.aggression.self, pIndex: idx });
-            allOtherPoints.push({ x: avgTight, y: avgAgg, pIndex: idx });
+            allSelfPoints.push({x: p.profile.tightness.self, y: p.profile.aggression.self, pIndex: idx});
+            allOtherPoints.push({x: avgTight, y: avgAgg, pIndex: idx});
         });
 
         const glowPlugin = {
             id: 'glowEffect',
             beforeDatasetsDraw: (chart) => {
-                const { ctx, config } = chart;
-                const activeId = config.activePlayerIndex;
+                const {ctx} = chart;
+                const activeId = chart.options.activePlayerIndex;
 
                 if (activeId === undefined || activeId === null) return;
 
@@ -736,7 +1368,7 @@
                     meta.data.forEach((point, index) => {
                         const raw = dataset.data[index];
                         if (raw && raw.pIndex === activeId) {
-                            const { x, y } = point.getProps(['x', 'y'], true);
+                            const {x, y} = point.getProps(['x', 'y'], true);
 
                             if (datasetIndex === 0) {
                                 ctx.shadowColor = '#C5A059';
@@ -777,7 +1409,7 @@
         };
 
         if (scatterChart) {
-            scatterChart.config.activePlayerIndex = currentId;
+            scatterChart.options.activePlayerIndex = currentId;
             scatterChart.data.datasets[0].data = allSelfPoints;
             scatterChart.data.datasets[1].data = allOtherPoints;
             scatterChart.data.datasets[0].pointBackgroundColor = (c) => getColor(c, true);
@@ -791,15 +1423,14 @@
                 data: {
                     datasets: [
                         {
-                            label: '自评定位',
+                            // label 属性其实可以删掉了，因为不再显示自带图例
                             data: allSelfPoints,
                             pointBackgroundColor: (c) => getColor(c, true),
                             borderWidth: 0,
                             pointRadius: 6,
-                            pointStyle: 'rectRot'
+                            pointStyle: 'rectRot' // 菱形
                         },
                         {
-                            label: '队友眼中的你',
                             data: allOtherPoints,
                             pointBackgroundColor: (c) => getColor(c, false),
                             borderWidth: 0,
@@ -809,7 +1440,7 @@
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    layout: { padding: 10 },
+                    layout: {padding: 10},
                     activePlayerIndex: currentId,
                     scales: {
                         x: {
@@ -818,7 +1449,7 @@
                                 color: (c) => c.tick.value === 5 ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.02)',
                                 lineWidth: (c) => c.tick.value === 5 ? 1 : 1
                             },
-                            ticks: { display: false }, border: { display: false }
+                            ticks: {display: false}, border: {display: false}
                         },
                         y: {
                             min: 0, max: 10,
@@ -826,22 +1457,23 @@
                                 color: (c) => c.tick.value === 5 ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.02)',
                                 lineWidth: (c) => c.tick.value === 5 ? 1 : 1
                             },
-                            ticks: { display: false }, border: { display: false }
+                            ticks: {display: false}, border: {display: false}
                         }
                     },
                     plugins: {
+                        // [关键修改] 彻底关闭自带图例
                         legend: {
-                            position: 'top', align: 'end',
-                            labels: { color: '#707570', boxWidth: 6, font: { size: 10, family: "'Noto Serif SC', serif" } }
+                            display: false
                         },
                         tooltip: {
                             backgroundColor: 'rgba(0,0,0,0.8)',
                             titleColor: '#C5A059',
                             bodyColor: '#fff',
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     const pId = playersData[context.raw.pIndex].id.split(' ')[0];
-                                    return `${pId}: (${context.raw.x}, ${context.raw.y})`;
+                                    // 保留两位小数
+                                    return `${pId}: (${context.raw.x.toFixed(2)}, ${context.raw.y.toFixed(2)})`;
                                 }
                             }
                         }
@@ -850,41 +1482,93 @@
             });
         }
     }
+
+    /**
+     * 数字滚动动画函数
+     * @param {HTMLElement} element - 要更新的 DOM 元素
+     * @param {number} targetValue - 最终数值
+     * @param {boolean} isInteger - 是否显示为整数 (默认 false，显示2位小数)
+     * @param {number} duration - 动画时长 (毫秒)
+     */
+    function animateValue(element, targetValue, isInteger = false, duration = 800) {
+        // 1. 获取当前显示的数值作为起点，如果无法解析则默认为 0
+        const startValue = parseFloat(element.innerText) || 0;
+        const startTime = performance.now();
+
+        // 2. 定义每一帧的更新逻辑
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            // 计算进度 (0 到 1)
+            const progress = Math.min(elapsed / duration, 1);
+
+            // 缓动效果 (Ease Out Cubic): 让动画开始快，结束慢，更自然
+            const ease = 1 - Math.pow(1 - progress, 3);
+
+            // 计算当前帧的数值
+            const current = startValue + (targetValue - startValue) * ease;
+
+            // 更新文字 (保留2位小数以实现滚动效果)
+            element.innerText = isInteger ? Math.round(current) : current.toFixed(2);
+
+            // 如果动画未结束，请求下一帧
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            } else {
+                // 确保最终数值精确
+                element.innerText = isInteger ? Math.round(targetValue) : targetValue.toFixed(2);
+            }
+        }
+
+        // 3. 启动动画
+        requestAnimationFrame(update);
+    }
+
     function updateDetails(player) {
         const allDims = [
             ...player.abilities.map(a => ({self: a.self, others: a.others})),
             {self: player.profile.tightness.self, others: player.profile.tightness.others},
-            {self: player.profile.aggression.self, others: player.profile.aggression.others}
+            {self: player.profile.aggression.self, others: player.profile.aggression.others},
         ];
+        if (maeValueDisplay) animateValue(maeValueDisplay, maeValueDisplay, false); // 这里设为 true 最终显示整数，设为 false 显示 8.00
 
         allDims.forEach((item, i) => {
-            const avg = (item.others.reduce((a,b)=>a+b,0) / item.others.length);
+            const avg = (item.others.reduce((a, b) => a + b, 0) / item.others.length);
             const gap = Math.abs(item.self - avg);
 
+            // --- 1. 处理进度条/圆点位置 (保持不变，这部分不需要数字动画) ---
             const selfDot = document.getElementById(`row-${i}-self`);
-            if(selfDot) selfDot.style.left = (item.self / 10) * 100 + '%';
+            if (selfDot) {
+                // 建议在 CSS 中给 .marker-self 加 transition: left 0.6s ease; 这样圆点也会平滑移动
+                selfDot.style.left = (item.self / 10) * 100 + '%';
+            }
 
-            for(let k=0; k<20; k++) {
+            for (let k = 0; k < 20; k++) {
                 const p = document.getElementById(`row-${i}-peer-${k}`);
-                if(p) p.style.display = 'none';
+                if (p) p.style.display = 'none';
             }
             item.others.forEach((val, j) => {
                 const peerDot = document.getElementById(`row-${i}-peer-${j}`);
                 if (peerDot) {
                     peerDot.style.display = 'block';
                     const jitter = (Math.random() - 0.5) * 1.5;
-                    const safeVal = Math.max(0, Math.min(100, (val/10)*100 + jitter));
+                    const safeVal = Math.max(0, Math.min(100, (val / 10) * 100 + jitter));
                     peerDot.style.left = safeVal + '%';
                 }
             });
 
+            // --- 2. 处理数字动画 (修改部分) ---
             const elSelf = document.getElementById(`row-${i}-val-self`);
             const elOther = document.getElementById(`row-${i}-val-other`);
             const elDiff = document.getElementById(`row-${i}-val-diff`);
 
-            elSelf.innerText = item.self;
-            elOther.innerText = avg.toFixed(1);
-            elDiff.innerText = gap.toFixed(1);
+            // 使用 animateValue 替代直接赋值
+            // item.self 通常是整数，如果你希望它也显示小数滚动效果，第三个参数传 false
+            // 如果你希望自评分为整数，第三个参数传 true
+            if (elSelf) animateValue(elSelf, item.self, true); // 这里设为 true 最终显示整数，设为 false 显示 8.00
+            if (elOther) animateValue(elOther, avg, false);    // 平均分保留小数
+            if (elDiff) animateValue(elDiff, gap, false);      // 差异保留小数
+
+
         });
     }
 

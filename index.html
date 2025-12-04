@@ -858,12 +858,25 @@
 
         <!-- 3. 评分细节 -->
         <div class="card full-width">
-            <div class="card-title">
-                评分分布细节
-                <span class="card-sub">
-                    认知偏差 (MAE): <span id="maeValue" class="rolling-number"
-                                          style="font-weight:bold; font-size:1.1rem;">0.0</span>
-                </span>
+            <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>评分分布细节</span>
+                <div class="card-sub" style="display: flex; align-items: center;">
+                    <span style="font-size: 0.9rem; margin-right: 8px; opacity: 0.7;">
+                                认知偏差(MAE):
+                    </span>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.5;">
+                        <div>
+                            <span style="opacity: 0.6; margin-right: 2px;">[自]</span>
+                            <span id="maeValue" class="rolling-number" style="font-weight:bold; font-size: 0.9rem; ">0.00</span>
+                        </div>
+
+                        <div>
+                            <span style="opacity: 0.6; margin-right: 2px;">[他]</span>
+                            <span id="maeOther" class="rolling-number"
+                                  style="font-weight:bold; font-size: 0.9rem;">0.00</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="detail-rows" id="detailRows"></div>
         </div>
@@ -889,256 +902,26 @@
     const dimensions = ["范围构建", "锦标赛ICM", "激进偷盲", "读牌能力", "数学理论", "心态耐力"];
 
     const playersData = [
-        {
-            id: "01 Viper (毒蛇)",
-            mae: "0.8",
-            profileLabel: "综合画像判定：紧凶型 (TAG)",
-            abilities: [
-                {self: 9, others: [8, 9, 8, 7, 9, 8, 9, 8, 7]},
-                {self: 8, others: [7, 8, 8, 6, 7, 8, 7, 8, 9]},
-                {self: 9, others: [9, 9, 8, 9, 9, 8, 9, 9, 8]},
-                {self: 7, others: [6, 7, 5, 6, 7, 6, 7, 5, 6]},
-                {self: 8, others: [8, 7, 8, 9, 8, 7, 8, 8, 7]},
-                {self: 9, others: [9, 8, 9, 9, 8, 9, 8, 9, 9]}
-            ],
-            profile: {
-                tightness: {self: 8.5, others: [8, 9, 8, 7, 9, 8, 8, 9, 7]},
-                aggression: {self: 9.0, others: [8, 9, 9, 8, 9, 9, 8, 9, 8]}
-            },
-            aiAdvice: `
-                <p><strong>综合评价：</strong>典型的鲨鱼玩家，各项数据非常顶尖。你的<strong>数学计算</strong>和<strong>学习能力</strong>是团队的核心资产。</p>
-                <p><strong>战术建议：</strong></p>
-                <ul>
-                    <li>你的形象过于“扎实”，导致诈唬成功率极高，但很难获得大底池支付。建议偶尔在干燥面展示一些非标准的手牌。</li>
-                    <li>资金管理评分略有波动，注意在高额桌的情绪控制。</li>
-                </ul>
-            `
-        },
-        {
-            id: "02 MadMax (疯子)",
-            mae: "2.4",
-            profileLabel: "综合画像判定：松凶型 (LAG)",
-            abilities: [
-                {self: 8, others: [5, 6, 4, 7, 5, 6, 4, 5, 6]},
-                {self: 10, others: [9, 10, 9, 8, 10, 9, 9, 10, 8]},
-                {self: 6, others: [4, 5, 3, 4, 5, 4, 3, 5, 4]},
-                {self: 9, others: [2, 3, 2, 4, 3, 2, 3, 2, 4]},
-                {self: 7, others: [5, 6, 4, 5, 6, 5, 4, 6, 5]},
-                {self: 5, others: [4, 3, 4, 5, 4, 3, 4, 5, 4]}
-            ],
-            profile: {
-                tightness: {self: 3.0, others: [2, 3, 2, 4, 2, 3, 2, 3, 2]},
-                aggression: {self: 9.5, others: [10, 9, 10, 9, 10, 9, 10, 9, 10]}
-            },
-            aiAdvice: `
-                <p><strong>综合评价：</strong>你是牌桌上的炸药桶，给对手制造了巨大的压力。你的<strong>诈唬频率</strong>极高，但基础数学跑分较低。</p>
-                <p><strong>战术建议：</strong></p>
-                <ul>
-                    <li>队友普遍认为你的资金管理存在巨大风险（平均分仅为2.8），请务必建立止损线。</li>
-                    <li>尝试减少翻前的入池率（VPIP），将侵略性更多地保留在翻后有位置的时候。</li>
-                </ul>
-            `
-        },
-        {
-            id: "03 Rocky (磐石)",
-            mae: "1.1",
-            profileLabel: "综合画像判定：紧弱型 (Nit)",
-            abilities: [
-                {self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]},
-                {self: 3, others: [2, 3, 2, 3, 2, 3, 2, 3, 2]},
-                {self: 8, others: [7, 8, 7, 8, 7, 8, 7, 8, 7]},
-                {self: 9, others: [9, 9, 8, 9, 9, 8, 9, 9, 9]},
-                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]},
-                {self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]}
-            ],
-            profile: {
-                tightness: {self: 9.0, others: [9, 9, 8, 9, 9, 9, 8, 9, 9]},
-                aggression: {self: 3.0, others: [2, 3, 2, 3, 2, 3, 2, 3, 2]}
-            },
-            aiAdvice: `
-                <p><strong>综合评价：</strong>你是最稳健的防守者，几乎不会犯大错。但你的打法过于诚实，容易被对手通过弃牌剥削。</p>
-                <p><strong>战术建议：</strong></p>
-                <ul>
-                    <li>你的“诚实度”太高了，当你在河牌下注时，对手几乎都会弃牌，导致你拿不到价值。</li>
-                    <li>建议在有利位置时，适当拓宽你的冷跟注（Cold Call）范围，增加一些不可预测性。</li>
-                </ul>
-            `
-        },
-        {
-            id: "04 Joker (小丑)",
-            mae: "3.5",
-            profileLabel: "综合画像判定：自我认知偏差型",
-            abilities: [
-                {self: 9, others: [4, 5, 3, 6, 4, 5, 3, 4, 5]},
-                {self: 8, others: [3, 4, 2, 5, 3, 4, 2, 3, 4]},
-                {self: 7, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]},
-                {self: 8, others: [4, 5, 4, 5, 4, 5, 4, 5, 4]},
-                {self: 9, others: [2, 3, 2, 4, 2, 3, 2, 3, 2]},
-                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]}
-            ],
-            profile: {
-                tightness: {self: 7.0, others: [3, 4, 3, 4, 3, 4, 3, 4, 3]},
-                aggression: {self: 8.0, others: [7, 8, 6, 7, 8, 7, 6, 8, 7]}
-            },
-            aiAdvice: `
-                <p><strong>综合评价：</strong>数据警报！你的自我评分（MAE 3.5）与队友评价存在巨大鸿沟。你认为自己是紧凶高手，但数据表明你打得非常松。</p>
-                <p><strong>战术建议：</strong></p>
-                <ul>
-                    <li><strong>心态管理</strong>是你的首要任务，队友评分显示你在逆风局极易崩溃（评分2-3）。</li>
-                    <li>请重新审视你的起手牌范围图表，严格执行翻前纪律，不要过度高估边缘牌的价值。</li>
-                </ul>
-            `
-        },
-        {
-            id: "05 Whale (老板)",
-            mae: "1.8",
-            profileLabel: "综合画像判定：松弱型 (Fish)",
-            abilities: [
-                {self: 5, others: [3, 4, 3, 4, 3, 4, 3, 4, 3]},
-                {self: 4, others: [2, 3, 2, 3, 2, 3, 2, 3, 2]},
-                {self: 3, others: [2, 2, 3, 2, 2, 3, 2, 2, 3]},
-                {self: 10, others: [10, 10, 10, 10, 10, 10, 10, 10, 10]},
-                {self: 8, others: [8, 9, 8, 9, 8, 9, 8, 9, 8]},
-                {self: 4, others: [3, 4, 3, 4, 3, 4, 3, 4, 3]}
-            ],
-            profile: {
-                tightness: {self: 4.0, others: [2, 3, 2, 3, 2, 3, 2, 3, 2]},
-                aggression: {self: 4.0, others: [2, 3, 2, 3, 2, 3, 2, 3, 2]}
-            },
-            aiAdvice: `
-                <p><strong>综合评价：</strong>你是牌桌上最受欢迎的玩家，心态极好，资金充裕。但技术层面存在明显的漏洞，入池率过高且缺乏攻击性。</p>
-                <p><strong>战术建议：</strong></p>
-                <ul>
-                    <li>学会弃掉顶对弱踢脚（Top Pair Weak Kicker），这是你最大的输钱来源。</li>
-                    <li>尝试在翻牌前进行加注，而不是永远只是跟注（Limp），掌握主动权。</li>
-                </ul>
-            `
-        },
-        {
-            id: "06 Ace (王牌)",
-            mae: "0.3",
-            profileLabel: "综合画像判定：GTO 均衡型",
-            abilities: [
-                {self: 8, others: [8, 8, 9, 8, 8, 9, 8, 8, 9]},
-                {self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8]},
-                {self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9]},
-                {self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8]},
-                {self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9]},
-                {self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9]}
-            ],
-            profile: {
-                tightness: {self: 7.5, others: [7, 8, 7, 8, 7, 8, 7, 8, 7]},
-                aggression: {self: 7.5, others: [7, 8, 7, 8, 7, 8, 7, 8, 7]}
-            },
-            aiAdvice: `
-                <p><strong>综合评价：</strong>完美的六边形战士。你的各项指标都非常均衡，几乎没有短板，打法接近 GTO（博弈论最优）。</p>
-                <p><strong>战术建议：</strong></p>
-                <ul>
-                    <li>在面对明显有漏洞的对手（如 MadMax 或 Whale）时，建议暂时偏离 GTO 策略，采用剥削性打法以最大化收益。</li>
-                    <li>保持现状，你是团队的中流砥柱。</li>
-                </ul>
-            `
-        },
-        {
-            id: "07 Shadow (影子)",
-            mae: "0.9",
-            profileLabel: "综合画像判定：中庸偏紧型",
-            abilities: [
-                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]},
-                {self: 5, others: [4, 5, 4, 5, 4, 5, 4, 5, 4]},
-                {self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]},
-                {self: 6, others: [6, 6, 6, 6, 6, 6, 6, 6, 6]},
-                {self: 7, others: [7, 7, 7, 7, 7, 7, 7, 7, 7]},
-                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]}
-            ],
-            profile: {
-                tightness: {self: 6.5, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]},
-                aggression: {self: 5.0, others: [4, 5, 4, 5, 4, 5, 4, 5, 4]}
-            },
-            aiAdvice: `
-                <p><strong>综合评价：</strong>你的存在感较低，但这有时是一种优势。你很少犯错，但也缺乏创造力，很难在深筹码时清空对手。</p>
-                <p><strong>战术建议：</strong></p>
-                <ul>
-                    <li>增加过牌-加注（Check-Raise）的频率，不要让对手便宜地看牌。</li>
-                    <li>在盲注保卫战中可以更加激进一些。</li>
-                </ul>
-            `
-        },
-        {
-            id: "08 Fox (狐狸)",
-            mae: "1.2",
-            profileLabel: "综合画像判定：狡猾多变型",
-            abilities: [
-                {self: 8, others: [7, 8, 6, 9, 7, 8, 6, 9, 7]},
-                {self: 9, others: [8, 9, 7, 9, 8, 9, 7, 9, 8]},
-                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]},
-                {self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]},
-                {self: 8, others: [7, 8, 7, 8, 7, 8, 7, 8, 7]},
-                {self: 7, others: [6, 7, 6, 7, 6, 7, 6, 7, 6]}
-            ],
-            profile: {
-                tightness: {self: 5.5, others: [4, 6, 5, 7, 4, 6, 5, 7, 5]},
-                aggression: {self: 7.0, others: [6, 8, 6, 8, 6, 8, 6, 8, 6]}
-            },
-            aiAdvice: `
-                <p><strong>综合评价：</strong>你非常擅长变换节奏，让对手难以捉摸。队友对你的评价方差很大，说明你成功地混淆了视听。</p>
-                <p><strong>战术建议：</strong></p>
-                <ul>
-                    <li>注意不要为了“多变”而多变，所有的混合策略（Mixing Strategy）都应该建立在数学期望之上。</li>
-                    <li>加强对底池赔率的计算，有时你的操作虽然秀，但数学上是负EV的。</li>
-                </ul>
-            `
-        },
-        {
-            id: "09 T-800 (机器)",
-            mae: "0.2",
-            profileLabel: "综合画像判定：ABC 标准型",
-            abilities: [
-                {self: 7, others: [7, 7, 7, 7, 7, 7, 7, 7, 7]},
-                {self: 6, others: [6, 6, 6, 6, 6, 6, 6, 6, 6]},
-                {self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8]},
-                {self: 8, others: [8, 8, 8, 8, 8, 8, 8, 8, 8]},
-                {self: 9, others: [9, 9, 9, 9, 9, 9, 9, 9, 9]},
-                {self: 7, others: [7, 7, 7, 7, 7, 7, 7, 7, 7]}
-            ],
-            profile: {
-                tightness: {self: 8.0, others: [8, 8, 8, 8, 8, 8, 8, 8, 8]},
-                aggression: {self: 6.0, others: [6, 6, 6, 6, 6, 6, 6, 6, 6]}
-            },
-            aiAdvice: `
-                <p><strong>综合评价：</strong>你像机器人一样执行策略，情绪极其稳定，从不 Tilt。你是低级别牌桌的收割机，但在高级别容易被针对。</p>
-                <p><strong>战术建议：</strong></p>
-                <ul>
-                    <li>你的打法太容易被预测了（ABC Poker）。在面对思考层级较高的对手时，需要引入一些平衡范围的操作。</li>
-                    <li>尝试在干燥面进行更多的持续下注（C-Bet）。</li>
-                </ul>
-            `
-        },
-        {
-            id: "10 Phoenix (凤凰)",
-            mae: "1.5",
-            profileLabel: "综合画像判定：激进翻盘型",
-            abilities: [
-                {self: 7, others: [6, 7, 5, 8, 6, 7, 5, 8, 6]},
-                {self: 8, others: [7, 9, 6, 8, 7, 9, 6, 8, 7]},
-                {self: 6, others: [5, 6, 5, 6, 5, 6, 5, 6, 5]},
-                {self: 5, others: [4, 5, 4, 5, 4, 5, 4, 5, 4]},
-                {self: 9, others: [8, 9, 9, 9, 8, 9, 9, 9, 8]},
-                {self: 8, others: [7, 8, 7, 8, 7, 8, 7, 8, 7]}
-            ],
-            profile: {
-                tightness: {self: 4.5, others: [3, 5, 4, 6, 3, 5, 4, 6, 4]},
-                aggression: {self: 8.5, others: [8, 9, 8, 9, 8, 9, 8, 9, 8]}
-            },
-            aiAdvice: `
-                <p><strong>综合评价：</strong>你拥有一颗大心脏，经常在短码时上演奇迹翻盘。你的风格极具侵略性，擅长给对手施压。</p>
-                <p><strong>战术建议：</strong></p>
-                <ul>
-                    <li>虽然你擅长翻盘，但最好不要让自己频繁陷入短码状态。前期阶段请打得更稳健一些。</li>
-                    <li>注意泡沫期（Bubble）的ICM压力，不要在没有弃牌率的时候全下。</li>
-                </ul>
-            `
-        }
+{'id': '01 Bbbbbb(疯子)', 'mae': '1.99', 'maeOther': '1.34', 'profileLabel': '综合画像判定：失控的加注机 (Maniac)', 'abilities': [{'self': 4.0, 'others': [3.0, 6.0, 3.0, 7.0, 7.0, 1.0, 7.0, 2.0, 8.0]}, {'self': 7.0, 'others': [5.0, 6.0, 8.0, 4.0, 5.0, 3.0, 7.0, 1.0, 8.0]}, {'self': 9.0, 'others': [9.0, 6.0, 8.0, 9.0, 8.0, 8.0, 9.0, 8.0, 9.0]}, {'self': 10.0, 'others': [4.0, 6.0, 7.0, 8.0, 3.0, 4.0, 8.0, 8.0, 7.0]}, {'self': 8.0, 'others': [4.0, 5.0, 5.0, 7.0, 8.0, 2.0, 7.0, 3.0, 7.0]}, {'self': 3.0, 'others': [2.0, 4.0, 5.0, 5.0, 5.0, 4.0, 9.0, 1.0, 1.0]}], 'profile': {'tightness': {'self': 6.0, 'others': [4.0, 3.0, 3.0, 2.0, 1.0, 1.0, 1.0, 1.0, 8.0]}, 'aggression': {'self': 9.0, 'others': [8.0, 5.0, 9.0, 8.0, 8.0, 7.0, 7.0, 5.0, 10.0]}}, 'aiAdvice': '\n        <p><strong>综合评价：</strong>名副其实的<strong>【疯子】</strong>。你对自己读牌能力的评分是满分（10.0），而大家只给你6.1分。你自认紧度适中（6.0），大家公认你是全场最松（2.6）。你不是在打牌，你是在送钱。</p>\n        <p><strong>战术建议：</strong></p>\n        <ul>\n            <li><strong>强行降速：</strong>你的所有数据都是红色的警报。你需要强制自己每局牌弃牌率达到80%以上。如果做不到，任何技术调整都是徒劳。</li>\n            <li><strong>停止Hero Call：</strong>你以为你是读牌天才，能抓到每一次诈唬，但事实是你支付了所有的强牌。不中牌就弃牌，这对你来说是最赚的策略。</li>\n        </ul>\n    '},
+{'id': '02 GW(毒蛇)', 'mae': '2.36', 'maeOther': '2.05', 'profileLabel': '综合画像判定：盲目的喷射机 (Spewy LAG)', 'abilities': [{'self': 10.0, 'others': [3.0, 3.0, 3.0, 3.0, 3.0, 5.0, 1.0, 4.0, 9.0]}, {'self': 5.0, 'others': [4.0, 5.0, 8.0, 9.0, 3.0, 3.0, 2.0, 9.0, 8.0]}, {'self': 6.0, 'others': [7.0, 5.0, 7.0, 8.0, 9.0, 6.0, 8.0, 9.0, 9.0]}, {'self': 2.0, 'others': [4.0, 5.0, 5.0, 5.0, 1.0, 3.0, 2.0, 5.0, 8.0]}, {'self': 2.0, 'others': [3.0, 5.0, 5.0, 7.0, 1.0, 5.0, 1.0, 3.0, 7.0]}, {'self': 2.0, 'others': [2.0, 4.0, 3.0, 3.0, 1.0, 1.0, 1.0, 4.0, 1.0]}], 'profile': {'tightness': {'self': 6.0, 'others': [4.0, 3.0, 3.0, 8.0, 1.0, 1.0, 1.0, 3.0, 7.0]}, 'aggression': {'self': 5.0, 'others': [8.0, 6.0, 8.0, 5.0, 10.0, 8.0, 10.0, 10.0, 10.0]}}, 'aiAdvice': '\n        <p><strong>综合评价：</strong>达克效应（Dunning-Kruger）的最佳案例。你像一条<strong>【毒蛇】</strong>，不仅攻击别人，也常常咬伤自己。你自评“范围构建”满分（10.0），而公认评分只有3.4。这种认知的鸿沟是灾难性的，你自以为在GTO，其实是在乱打。</p>\n        <p><strong>战术建议：</strong></p>\n        <ul>\n            <li><strong>清空归零：</strong>忘掉你那些“高端”的操作。你的基础范围是错的。请从头开始学习<strong>翻前起手牌表</strong>，严格执行，不要有任何创造性发挥。</li>\n            <li><strong>控制攻击欲：</strong>公认激进分高达8.3，说明你在过度诈唬。在没有坚实范围支持的情况下，停止你的Triple Barrel（三枪）。</li>\n        </ul>\n    '},
+{'id': '03 暗流(小丑)', 'mae': '1.75', 'maeOther': '1.30', 'profileLabel': '综合画像判定：混乱的伪紧手 (Loose Aggressive)', 'abilities': [{'self': 7.0, 'others': [3.0, 6.0, 5.0, 5.0, 8.0, 3.0, 4.0, 8.0, 9.0]}, {'self': 8.0, 'others': [5.0, 5.0, 8.0, 8.0, 5.0, 10.0, 4.0, 3.0, 8.0]}, {'self': 8.0, 'others': [7.0, 6.0, 8.0, 9.0, 8.0, 8.0, 7.0, 3.0, 9.0]}, {'self': 8.0, 'others': [5.0, 6.0, 7.0, 7.0, 3.0, 4.0, 5.0, 8.0, 7.0]}, {'self': 7.0, 'others': [4.0, 5.0, 5.0, 7.0, 8.0, 6.0, 4.0, 2.0, 7.0]}, {'self': 7.0, 'others': [2.0, 5.0, 4.0, 4.0, 4.0, 5.0, 9.0, 2.0, 1.0]}], 'profile': {'tightness': {'self': 8.0, 'others': [3.0, 5.0, 4.0, 7.0, 5.0, 5.0, 6.0, 6.0, 8.0]}, 'aggression': {'self': 8.0, 'others': [6.0, 6.0, 7.0, 8.0, 9.0, 8.0, 7.0, 5.0, 10.0]}}, 'aiAdvice': '\n        <p><strong>综合评价：</strong><strong>典型的自我认知错位。</strong>你自封“紧手”（自评紧度8.0），但在群众眼里你是到处乱入池的<strong>【小丑】</strong>（公认紧度5.4）。你以为自己在狙击，实际是在扫射。这种形象偏差是你长期漏码的根源。</p>\n        <p><strong>战术建议：</strong></p>\n        <ul>\n            <li><strong>正视现实：</strong>承认吧，你并不紧。你的VPIP（入池率）绝对超标了。请把所有非同花的高张（KJo, QJo）和弱Ax直接从枪口位范围里删掉。</li>\n            <li><strong>激进的质量：</strong>你的激进得分很高（~7.3），但这更多是“鲁莽”而非“施压”。在没有位置和范围优势时，不要盲目且频繁地开枪。</li>\n        </ul>\n    '},
+{'id': '04 JinFu(老板)', 'mae': '2.36', 'maeOther': '1.79', 'profileLabel': '综合画像判定：凡尔赛大魔王 (Top Reg)', 'abilities': [{'self': 5.0, 'others': [8.0, 8.0, 4.0, 7.0, 8.0, 5.0, 9.0, 8.0, 9.0]}, {'self': 5.0, 'others': [7.0, 8.0, 8.0, 9.0, 10.0, 3.0, 8.0, 7.0, 8.0]}, {'self': 8.0, 'others': [7.0, 8.0, 8.0, 8.0, 6.0, 6.0, 7.0, 7.0, 9.0]}, {'self': 3.0, 'others': [8.0, 8.0, 8.0, 8.0, 9.0, 4.0, 9.0, 7.0, 8.0]}, {'self': 5.0, 'others': [7.0, 6.0, 5.0, 7.0, 8.0, 5.0, 7.0, 9.0, 7.0]}, {'self': 3.0, 'others': [8.0, 6.0, 5.0, 8.0, 10.0, 7.0, 7.0, 8.0, 3.0]}], 'profile': {'tightness': {'self': 5.0, 'others': [7.0, 6.0, 5.0, 8.0, 9.0, 7.0, 9.0, 6.0, 8.0]}, 'aggression': {'self': 8.0, 'others': [7.0, 8.0, 8.0, 8.0, 5.0, 6.0, 8.0, 5.0, 10.0]}}, 'aiAdvice': '\n        <p><strong>综合评价：</strong><strong>过度的谦虚就是虚伪。</strong>你自评读牌能力3分（全场最低），公认评分却高达7.7分（全场顶尖）。你就是那个掌控全场的<strong>【老板】</strong>，却非要装作一无所知。你的数据是统治级的，你的心态却像个初学者。</p>\n        <p><strong>战术建议：</strong></p>\n        <ul>\n            <li><strong>统治桌子：</strong>既然大家都如此尊重你的技术（公认生存/读牌均为顶尖），你应当利用这份恐惧。在泡沫期疯狂施压，对手会因为觉得“他这么强一定是有牌”而过分弃牌。</li>\n            <li><strong>自信推注：</strong>别再给自己的犹豫找借口。你的直觉比大多数人的计算都准，相信它，执行它。</li>\n        </ul>\n    '},
+{'id': '05 Kuo(王牌)', 'mae': '1.18', 'maeOther': '1.50', 'profileLabel': '综合画像判定：无情的碾压者 (Crusher)', 'abilities': [{'self': 9.0, 'others': [9.0, 8.0, 8.0, 9.0, 9.0, 10.0, 8.0, 4.0, 7.0]}, {'self': 8.0, 'others': [8.0, 5.0, 9.0, 6.0, 8.0, 8.0, 10.0, 9.0, 10.0]}, {'self': 9.0, 'others': [7.0, 7.0, 9.0, 8.0, 10.0, 4.0, 9.0, 3.0, 9.0]}, {'self': 7.0, 'others': [8.0, 7.0, 8.0, 8.0, 8.0, 4.0, 8.0, 10.0, 10.0]}, {'self': 8.0, 'others': [10.0, 7.0, 5.0, 8.0, 9.0, 9.0, 9.0, 10.0, 10.0]}, {'self': 3.0, 'others': [10.0, 6.0, 8.0, 8.0, 6.0, 9.0, 8.0, 2.0, 8.0]}], 'profile': {'tightness': {'self': 9.0, 'others': [9.0, 7.0, 8.0, 8.0, 8.0, 9.0, 9.0, 6.0, 8.0]}, 'aggression': {'self': 8.0, 'others': [9.0, 8.0, 8.0, 9.0, 6.0, 10.0, 7.0, 5.0, 10.0]}}, 'aiAdvice': '\n        <p><strong>综合评价：</strong>当之无愧的<strong>【王牌】</strong>。自评高（8-9分），公认更高（8-10分）。你是典型的紧凶大魔王，各项技术指标几乎触顶。你是所有玩家最不想坐在左手边的人。</p>\n        <p><strong>战术建议：</strong></p>\n        <ul>\n            <li><strong>应对针对：</strong>你现在是全场的靶子。聪明的对手会对你过度弃牌（Over-fold）。建议你在翻前混合一些A5s/KXs的3-bet诈唬，因为对手太尊重你的加注了。</li>\n            <li><strong>情绪管理：</strong>心态是你唯一的短板（自评3.0）。当你的完美策略遭遇Bad Beat时，不要上头。记住，运气是技术唯一的克星，接受它。</li>\n        </ul>\n    '},
+{'id': '06 LY(狐狸)', 'mae': '0.78', 'maeOther': '1.10', 'profileLabel': '综合画像判定：狡黠的紧弱 (Tight Passive)', 'abilities': [{'self': 7.0, 'others': [6.0, 8.0, 8.0, 6.0, 5.0, 5.0, 5.0, 4.0, 8.0]}, {'self': 7.0, 'others': [6.0, 6.0, 8.0, 8.0, 8.0, 5.0, 7.0, 2.0, 5.0]}, {'self': 6.0, 'others': [4.0, 7.0, 6.0, 4.0, 1.0, 4.0, 4.0, 7.0, 9.0]}, {'self': 6.0, 'others': [6.0, 7.0, 7.0, 6.0, 3.0, 4.0, 5.0, 7.0, 7.0]}, {'self': 5.0, 'others': [7.0, 6.0, 6.0, 9.0, 2.0, 5.0, 4.0, 7.0, 7.0]}, {'self': 5.0, 'others': [6.0, 5.0, 7.0, 9.0, 5.0, 6.0, 7.0, 3.0, 8.0]}], 'profile': {'tightness': {'self': 7.0, 'others': [6.0, 5.0, 8.0, 9.0, 10.0, 6.0, 8.0, 1.0, 8.0]}, 'aggression': {'self': 6.0, 'others': [6.0, 7.0, 8.0, 4.0, 2.0, 6.0, 2.0, 5.0, 5.0]}}, 'aiAdvice': '\n        <p><strong>综合评价：</strong>全场认知最精准的选手（MAE 0.78）。你像一只<strong>【狐狸】</strong>，聪明、审慎，但也有些过于保守。虽然你自评激进6分，但对手公认你只有5.0分。你太想“正确”地打牌，导致缺乏统治力。</p>\n        <p><strong>战术建议：</strong></p>\n        <ul>\n            <li><strong>提升Aggression Factor：</strong>你的“紧”是公认的（~6.8），这意味着你的诈唬成功率极高。不要只等到坚果才行动，试着在Turn和River转守为攻。</li>\n            <li><strong>防守过牌范围：</strong>你目前过于诚实，Check往往代表示弱。学会用听牌和后门花去Check-Raise，否则你会被凶猛的对手随意剥削。</li>\n        </ul>\n    '},
+{'id': '07 LZQ(磐石)', 'mae': '1.39', 'maeOther': '1.92', 'profileLabel': '综合画像判定：沉睡的化石 (Nit/Rock)', 'abilities': [{'self': 4.0, 'others': [5.0, 5.0, 8.0, 1.0, 6.0, 5.0, 7.0, 5.0, 7.0]}, {'self': 5.0, 'others': [9.0, 5.0, 7.0, 9.0, 9.0, 8.0, 5.0, 4.0, 8.0]}, {'self': 3.0, 'others': [1.0, 5.0, 5.0, 7.0, 1.0, 1.0, 1.0, 1.0, 3.0]}, {'self': 5.0, 'others': [3.0, 5.0, 6.0, 6.0, 6.0, 3.0, 4.0, 4.0, 8.0]}, {'self': 5.0, 'others': [5.0, 5.0, 5.0, 4.0, 6.0, 2.0, 4.0, 7.0, 8.0]}, {'self': 5.0, 'others': [10.0, 6.0, 5.0, 8.0, 10.0, 5.0, 9.0, 10.0, 3.0]}], 'profile': {'tightness': {'self': 5.0, 'others': [10.0, 5.0, 7.0, 9.0, 10.0, 10.0, 10.0, 10.0, 3.0]}, 'aggression': {'self': 5.0, 'others': [5.0, 5.0, 6.0, 3.0, 2.0, 2.0, 1.0, 1.0, 5.0]}}, 'aiAdvice': '\n        <p><strong>综合评价：</strong>你不是紧，你是<strong>【磐石】</strong>。公认紧度高达8.6（全场最高），公认偷盲能力仅3.3（全场最低）。对手完全看透了你：“不中牌不打，一打就是牌”。你正在被盲注一点点吞噬。</p>\n        <p><strong>战术建议：</strong></p>\n        <ul>\n            <li><strong>必须偷盲：</strong>在锦标赛后期，你的打法是慢性死亡。在后位（CO/BTN）拿到任意同花高张或对子时，必须强制自己加注，而不是平跟或弃牌。</li>\n            <li><strong>C-Bet防守：</strong>因为你形象太好，你在干燥面做持续下注（C-Bet）几乎是印钱的。不要因为没中牌就Check-Fold，大胆地打出去！</li>\n        </ul>\n    '},
+{'id': '08 VN(影子)', 'mae': '2.07', 'maeOther': '1.04', 'profileLabel': '综合画像判定：隐秘的杀手 (Underrated TAG)', 'abilities': [{'self': 4.0, 'others': [7.0, 5.0, 7.0, 6.0, 5.0, 7.0, 7.0, 4.0, 8.0]}, {'self': 4.0, 'others': [8.0, 8.0, 7.0, 6.0, 5.0, 8.0, 5.0, 7.0, 7.0]}, {'self': 4.0, 'others': [7.0, 8.0, 6.0, 7.0, 5.0, 7.0, 7.0, 7.0, 8.0]}, {'self': 4.0, 'others': [7.0, 5.0, 7.0, 6.0, 3.0, 4.0, 7.0, 8.0, 8.0]}, {'self': 5.0, 'others': [5.0, 5.0, 7.0, 6.0, 5.0, 5.0, 7.0, 9.0, 7.0]}, {'self': 4.0, 'others': [6.0, 4.0, 7.0, 4.0, 4.0, 6.0, 8.0, 7.0, 8.0]}], 'profile': {'tightness': {'self': 5.0, 'others': [7.0, 5.0, 7.0, 6.0, 5.0, 6.0, 8.0, 5.0, 8.0]}, 'aggression': {'self': 5.0, 'others': [7.0, 7.0, 7.0, 8.0, 8.0, 6.0, 8.0, 5.0, 7.0]}}, 'aiAdvice': '\n        <p><strong>综合评价：</strong><strong>德州扑克不需要怯懦！</strong>你给自己全线打4分，而公认评分却高达7-8分。这种极度的自我低估（MAE 2.07）是严重的EV泄漏。你像一道<strong>【影子】</strong>，明明有击杀全场的能力，却总在关键时刻因为不自信而缩手缩脚。</p>\n        <p><strong>战术建议：</strong></p>\n        <ul>\n            <li><strong>停止自我设限：</strong>在对手眼里你已经是一条鲨鱼了，不要再用鱼的思维打牌。当你的读牌告诉你“由于对手范围封顶我可以推All-in”时，不要因为“我觉得我只有4分水平”而弃牌。</li>\n            <li><strong>薄价值获取：</strong>你的谦虚导致你错过了大量的薄价值下注。请记住：如果你从未在河牌被抓鸡，说明你下注得不够多！</li>\n        </ul>\n    '},
+{'id': '09 ysc(机器)', 'mae': '0.99', 'maeOther': '1.02', 'profileLabel': '综合画像判定：稳健平衡型 (Standard TAG)', 'abilities': [{'self': 6.0, 'others': [5.0, 7.0, 8.0, 6.0, 7.0, 4.0, 8.0, 8.0, 8.0]}, {'self': 4.0, 'others': [5.0, 8.0, 8.0, 7.0, 3.0, 7.0, 8.0, 5.0, 7.0]}, {'self': 5.0, 'others': [5.0, 8.0, 8.0, 8.0, 5.0, 6.0, 5.0, 3.0, 8.0]}, {'self': 6.0, 'others': [5.0, 7.0, 8.0, 4.0, 3.0, 4.0, 8.0, 5.0, 7.0]}, {'self': 5.0, 'others': [5.0, 5.0, 6.0, 6.0, 5.0, 5.0, 7.0, 5.0, 7.0]}, {'self': 5.0, 'others': [5.0, 5.0, 8.0, 3.0, 4.0, 4.0, 8.0, 6.0, 8.0]}], 'profile': {'tightness': {'self': 6.0, 'others': [5.0, 7.0, 9.0, 7.0, 5.0, 6.0, 8.0, 5.0, 8.0]}, 'aggression': {'self': 8.0, 'others': [5.0, 7.0, 8.0, 9.0, 9.0, 8.0, 4.0, 5.0, 7.0]}}, 'aiAdvice': '\n        <p><strong>综合评价：</strong>你的代号是<strong>【机器】</strong>，因为你的MAE（0.99）显示出你对自己有着极其客观、近乎机械般精准的认知。你是一位标准的Grinder，打法稳健，没有明显的短板，但也没有让对手恐惧的长板。</p>\n        <p><strong>战术建议：</strong></p>\n        <ul>\n            <li><strong>打破平衡：</strong>你的各项数据太“标准”了，这让你在高端局中容易被阅读。建议偶尔在翻前用弱同花连张进行轻微的“过激”操作，扰乱对手对你的频率计算。</li>\n            <li><strong>利用诚实形象：</strong>你自评激进8分，但对手只给你6.9分。利用这个“信息差”，在河牌圈进行超额下注诈唬（Overbet Bluff），对手大概率会因为尊重你的形象而弃牌。</li>\n        </ul>\n    '},
+{'id': '10 ZDS(凤凰)', 'mae': '2.29', 'maeOther': '1.43', 'profileLabel': '综合画像判定：悲观的弱被动 (Loose Weak)', 'abilities': [{'self': 1.0, 'others': [4.0, 4.0, 3.0, 3.0, 3.0, 1.0, 3.0, 7.0, 8.0]}, {'self': 2.0, 'others': [5.0, 5.0, 7.0, 8.0, 5.0, 2.0, 3.0, 1.0, 5.0]}, {'self': 3.0, 'others': [7.0, 6.0, 9.0, 6.0, 6.0, 5.0, 4.0, 7.0, 10.0]}, {'self': 8.0, 'others': [8.0, 4.0, 5.0, 6.0, 6.0, 3.0, 4.0, 6.0, 7.0]}, {'self': 3.0, 'others': [2.0, 5.0, 5.0, 3.0, 8.0, 2.0, 3.0, 8.0, 7.0]}, {'self': 1.0, 'others': [1.0, 5.0, 3.0, 3.0, 2.0, 4.0, 1.0, 5.0, 7.0]}], 'profile': {'tightness': {'self': 2.0, 'others': [2.0, 3.0, 4.0, 2.0, 1.0, 1.0, 3.0, 5.0, 8.0]}, 'aggression': {'self': 5.0, 'others': [9.0, 5.0, 9.0, 4.0, 6.0, 4.0, 3.0, 5.0, 10.0]}}, 'aiAdvice': '\n        <p><strong>综合评价：</strong>你需要涅槃重生，所以称号是<strong>【凤凰】</strong>。你目前处于“自暴自弃”的状态：自评几乎全是1-2分，打法上又是公认的“松弱”（紧度公认3.2）。你玩得太宽，放弃得太快，毫无自信可言。</p>\n        <p><strong>战术建议：</strong></p>\n        <ul>\n            <li><strong>禁止Limp（平跟）：</strong>你最大的漏洞是被动入池。请立下规矩：要么加注，要么弃牌。这能瞬间提升你的形象和胜率。</li>\n            <li><strong>背诵表格：</strong>你的基础薄弱不是借口。熟背<strong>15BB推弃表</strong>，在短码时把决定权交给数学，而不是交给你那摇摆不定的心态。</li>\n        </ul>\n    '},
+
+
+
+
+
+
+
+
+
+
     ];
 
     // ============================================================================
@@ -1168,6 +951,7 @@
     const aiAdvice = document.getElementById('aiAdvice');
     const profileText = document.getElementById('profileText');
     const maeValueDisplay = document.getElementById('maeValue');
+    const maeValueOtherDisplay = document.getElementById('maeOther');
 
     function populateSelects() {
         playersData.forEach((p, index) => {
@@ -1257,6 +1041,7 @@
         }, 200);
 
         animateValue(maeValueDisplay, parseFloat(player.mae), false);
+        animateValue(maeValueOtherDisplay, parseFloat(player.maeOther), false);
     }
 
     function updateRadar(player) {
@@ -1530,6 +1315,7 @@
             {self: player.profile.aggression.self, others: player.profile.aggression.others},
         ];
         if (maeValueDisplay) animateValue(maeValueDisplay, maeValueDisplay, false); // 这里设为 true 最终显示整数，设为 false 显示 8.00
+        if (maeValueOtherDisplay) animateValue(maeValueOtherDisplay, maeValueOtherDisplay, false); // 这里设为 true 最终显示整数，设为 false 显示 8.00
 
         allDims.forEach((item, i) => {
             const avg = (item.others.reduce((a, b) => a + b, 0) / item.others.length);
